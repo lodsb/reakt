@@ -1,5 +1,5 @@
 
-package reakt
+package org.lodsb.reakt
 
 class Var[T](_value: T) extends Val[T](_value) {
 	def update(newValue: T) = {

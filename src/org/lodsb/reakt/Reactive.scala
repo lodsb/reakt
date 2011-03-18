@@ -1,4 +1,4 @@
-package reakt
+package org.lodsb.reakt
 
 import graph.{NodeBase, Edge, ReactiveGraph}
 import java.util.concurrent.atomic.{AtomicLong, AtomicBoolean}
@@ -117,6 +117,10 @@ class Reactive[DefinedType, UndefinedType](protected val defaultDefValue: Define
 
 trait TSignalet[+ValueType] extends TObservableValue[ValueType, ValueType]
 
+object ConstantSignal {
+	implicit def something2ConstantSignal[SC](something: SC) = new ConstantSignal(something)
+}
+
 class ConstantSignal[+T](init: T) extends TSignalet[T] {
 	def value: Either[T, T] = Left(init)
 
@@ -125,7 +129,7 @@ class ConstantSignal[+T](init: T) extends TSignalet[T] {
 
 class Signal[ValueType](init: ValueType) extends Reactive[ValueType, ValueType](init, init)
 with TSignalet[ValueType] {
-
+	implicit def something2ConstantSignal[SC](something: SC) = new ConstantSignal(something)
 	// publish initial value
 	this.emit(init)
 

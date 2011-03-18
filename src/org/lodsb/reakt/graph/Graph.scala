@@ -1,9 +1,9 @@
-package reakt.graph
+package org.lodsb.reakt.graph
 
 import actors.Actor
 import java.util.Random
 import scala.collection.mutable.HashMap
-import reakt.{Var, Reactive}
+import org.lodsb.reakt.{Var, Reactive}
 import java.util.concurrent.atomic.{AtomicInteger, AtomicLong}
 
 case class Edge(source: NodeBase[_], destination: NodeBase[_])
@@ -153,7 +153,7 @@ object Test {
 				"END"
 			}
 		}*/
-		val end = new Var[Int](12); //new reakt.Reactive.Signal[Int](123)
+		val end = new Var[Int](12); //new org.lodsb.reakt.Reactive.Signal[Int](123)
 		end.start
 
 		for (i <- 0 to it) {

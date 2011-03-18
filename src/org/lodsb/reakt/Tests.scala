@@ -1,8 +1,9 @@
-package reakt
+package org.lodsb.reakt
+import org.lodsb.reakt.ConstantSignal._
+
 
 object Tests {
 	def main(args: Array[String]) = {
-		implicit def something2ConstantSignal[SC](something: SC) = new ConstantSignal(something)
 
 		val x = new Var[Int](5)
 		val z = new Var[String](" WORLD")
