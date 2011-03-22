@@ -24,13 +24,16 @@
 package org.lodsb.reakt
 
 class Var[T](_value: T) extends Val[T](_value) {
+
+	//override def action(msg: T) = this.emit(msg)
+
 	def update(newValue: T) = {
 		this.onUpdateValue(newValue)
 		this.emit(newValue)
 	}
 
-	def <~[B >: T](that: Signal[B]) : Signal[B] = {
-		Reactive.connect(that, this)
+	def <~[B <: T](that: Signal[B]) : Signal[B] = {
+		that.observe({x => this() = x ;true})
 
 		that
 	}

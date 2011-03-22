@@ -78,7 +78,7 @@ class Reactive[DefinedType, UndefinedType](protected val defaultDefValue: Define
 	protected var _undefValue: UndefinedType = defaultUndefValue;
 	protected var _defValue: DefinedType = defaultDefValue;
 
-	private val processingMessages = new AtomicBoolean
+	protected  val processingMessages = new AtomicBoolean
 
 	protected def generateUndefTypeValue(): UndefinedType = {
 		defaultUndefValue
@@ -151,7 +151,8 @@ class ConstantSignal[+T](init: T) extends TSignalet[T] {
 
 class Signal[ValueType](init: ValueType) extends Reactive[ValueType, ValueType](init, init)
 with TSignalet[ValueType] {
-	implicit def something2ConstantSignal[SC](something: SC) = new ConstantSignal(something)
+
+
 	// publish initial value
 	this.emit(init)
 
@@ -200,7 +201,9 @@ with TSignalet[ValueType] {
 	}
 
 	def ~>[B >: ValueType](that: Var[B]): Var[B] = {
-		Reactive.connect(this, that)
+
+		this.observe({x => that() = x ;true})
+
 		that
 	}
 
@@ -216,38 +219,39 @@ with TSignalet[ValueType] {
 		sig
 	}
 
-	def +(that: TSignalet[ValueType])(implicit numeric: Numeric[ValueType]) =
-		new BinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric.plus(x, y))
+	def +(that: TSignalet[ValueType])(implicit numeric1: Numeric[ValueType]) =
+		new BinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric1.plus(x, y))
 
 	def +(that: TSignalet[String]) =
 		new BinOpSignal(this, that, (x: ValueType, y: String) => x.toString + y)
 
-	def -(that: TSignalet[ValueType])(implicit numeric: Numeric[ValueType]) =
-		new BinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric.minus(x, y))
+	def -(that: TSignalet[ValueType])(implicit numeric2: Numeric[ValueType]) =
+		new BinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric2.minus(x, y))
 
-	def *(that: TSignalet[ValueType])(implicit numeric: Numeric[ValueType]) =
-		new BinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric.times(x, y))
+	def *(that: TSignalet[ValueType])(implicit numeric3: Numeric[ValueType]) =
+		new BinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric3.times(x, y))
 
-	def min(that: TSignalet[ValueType])(implicit numeric: Numeric[ValueType]) =
-		new BinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric.min(x, y))
+	def min(that: TSignalet[ValueType])(implicit numeric4: Numeric[ValueType]) =
+		new BinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric4.min(x, y))
 
-	def max(that: TSignalet[ValueType])(implicit numeric: Numeric[ValueType]) =
-		new BinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric.max(x, y))
+	def max(that: TSignalet[ValueType])(implicit numeric5: Numeric[ValueType]) =
+		new BinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric5.max(x, y))
 
-	def ==(that: TSignalet[ValueType])(implicit numeric: Numeric[ValueType]) =
-		new BinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric.equiv(x, y))
+	//FIXME: where is it called from?
+	//def ==(that: TSignalet[ValueType])(implicit numeric6: Numeric[ValueType]) =
+	//	new BinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric6.equiv(x, y))
 
-	def >=(that: TSignalet[ValueType])(implicit numeric: Numeric[ValueType]) =
-		new BinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric.gteq(x, y))
+	def >=(that: TSignalet[ValueType])(implicit numeric7: Numeric[ValueType]) =
+		new BinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric7.gteq(x, y))
 
-	def <=(that: TSignalet[ValueType])(implicit numeric: Numeric[ValueType]) =
-		new BinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric.lteq(x, y))
+	def <=(that: TSignalet[ValueType])(implicit numeric8: Numeric[ValueType]) =
+		new BinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric8.lteq(x, y))
 
-	def >(that: TSignalet[ValueType])(implicit numeric: Numeric[ValueType]) =
-		new BinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric.gt(x, y))
+	def >(that: TSignalet[ValueType])(implicit numeric9: Numeric[ValueType]) =
+		new BinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric9.gt(x, y))
 
-	def <(that: TSignalet[ValueType])(implicit numeric: Numeric[ValueType]) =
-		new BinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric.lt(x, y))
+	def <(that: TSignalet[ValueType])(implicit numeric11: Numeric[ValueType]) =
+		new BinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric11.lt(x, y))
 
 	def binOp[A, B](that: Signal[A], binOpFun: (ValueType, A) => B) = {
 		(new BinOpSignal(this, that, binOpFun)).asInstanceOf[Signal[B]]
@@ -255,5 +259,5 @@ with TSignalet[ValueType] {
 
 }
 
-class Event[ValueType, UndefValueType](x: ValueType, y: UndefValueType)
+class EventSource[ValueType, UndefValueType](x: ValueType, y: UndefValueType)
 	extends Reactive[ValueType, UndefValueType](x, y)

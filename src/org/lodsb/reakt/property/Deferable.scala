@@ -24,17 +24,21 @@ package org.lodsb.reakt.property
 
 import org.lodsb.reakt.Var
 
+abstract trait VarDeferor {
+	def defer[A](`def` : Deferable[A]): Unit
+}
 
 case class Deferable[A](varDefer: VarDefering[A], value: A)
 
-class VarDefering[A](protected val deferor: VarDeferor, protected[react] var _value: A) extends Var[A] {
+class VarDefering[A](protected val deferor: VarDeferor,  value: A) extends Var[A](value) {
+
 	def updateCallback(newValue: A) = if (_value != newValue) {
 		_value = newValue
 		this.onUpdateValue(newValue)
 		this.emit(newValue)
 	}
 
-	def update(newValue: A) = {
+	override def update(newValue: A) = {
 		deferor.defer(Deferable(this, newValue))
 	}
 }

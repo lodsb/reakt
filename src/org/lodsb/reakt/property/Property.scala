@@ -25,13 +25,12 @@ import org.mt4j.util.math.Vector3D
 package org.lodsb.reakt.property {
 
 import org.lodsb.reakt.Val
-import org.lodsb.reakt.property.VarDefering
 
 object PropertyObserver {
 
 }
 
-class Property[T](deferor: VarDeferor, name: String, init: T, set: (T) => Unit, get: () => T) extends VarDefering[T](deferor, init) {
+class Property[T](deferor: VarDeferor, name: String, init: T, val set: (T) => Unit, val get: () => T) extends VarDefering[T](deferor, init) {
 
 	//this.update(init)
 
@@ -44,12 +43,11 @@ class Property[T](deferor: VarDeferor, name: String, init: T, set: (T) => Unit, 
 
 }
 
-class Attribute[T](name: String, protected[react] var _value: T) extends Val[T] {
-	this.emit(_value)
+class Attribute[T](val name: String, _value: T) extends Val[T](_value) {
 
-	def update(newVal: T) = {
-		_value = newVal
-		this.emit(_value)
+	def update(newValue: T) = {
+		this.onUpdateValue(newValue)
+		this.emit(newValue)
 	}
 }
 
