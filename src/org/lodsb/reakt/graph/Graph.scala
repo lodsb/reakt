@@ -44,14 +44,20 @@ trait NodeBase[+T] extends Actor {
 
 	protected def onUpdateValue[B >: T](value: B): Unit = {}
 
+	private val depLock = new Object
+
 	def addDependant(d: NodeBase[_]): Unit = {
-		this.dependants ::= d
+		depLock.synchronized {
+			this.dependants ::= d
+		}
 	}
 
 	//override def scheduler = Reactive.scheduler
 
 	def addDependingOn(source: NodeBase[_]): Unit = {
-		dependson.put(source, true)
+		depLock.synchronized {
+			dependson.put(source, true)
+		}
 	}
 
 	var cntr = 0;
@@ -71,29 +77,32 @@ trait NodeBase[+T] extends Actor {
 		loop {
 			react {
 				case p@Propagate(c, s, msg) => {
-
-					if (dependson.size == 0) {
-						onUpdateValue(msg.asInstanceOf[T])
-
-						this.emit(msg, c)
-					} else if (dependson.contains(s)) {
-						cntr = cntr + 1;
-
-						if (cntr == dependson.size) {
-
+					depLock.synchronized {
+						if (dependson.size == 0) {
 							onUpdateValue(msg.asInstanceOf[T])
 
 							this.emit(msg, c)
+						} else if (dependson.contains(s)) {
+							cntr = cntr + 1;
 
-							cntr = 0;
+							if (cntr == dependson.size) {
+
+								onUpdateValue(msg.asInstanceOf[T])
+
+								this.emit(msg, c)
+
+								cntr = 0;
+							}
 						}
 					}
 				}
+
 
 				case _ => println("===????")
 			}
 		}
 	}
+
 }
 
 object Test {
@@ -205,7 +214,7 @@ object Test {
 		println("Start");
 		startTime = System.nanoTime
 		for (i <- 0 to noMsg) {
-			sources.foreach(x => x() = 123 )
+			sources.foreach(x => x() = 123)
 		}
 
 		lock.synchronized {
