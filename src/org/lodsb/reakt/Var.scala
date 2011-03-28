@@ -6,7 +6,7 @@
  *    >>
  *  +2>>
  *    >>  Last modified:  2011 - 3 - 21 :: 4 : 26
- *    >>  Origin: eventgraphtest (project) / reakt (module)
+ *    >>  Origin: eventgraphtest (project) / reaktExt (module)
  *    >>
  *  +3>>
  *    >>  Copyright (c) 2011:

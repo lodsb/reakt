@@ -184,7 +184,7 @@ object Test {
 				"END"
 			}
 		}*/
-		val end = new Var[Int](12); //new org.lodsb.reakt.Reactive.Signal[Int](123)
+		val end = new Var[Int](12); //new org.lodsb.reaktExt.Reactive.Signal[Int](123)
 		end.start
 
 		for (i <- 0 to it) {

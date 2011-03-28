@@ -23,10 +23,7 @@
 package org.lodsb.reakt.property
 
 import org.lodsb.reakt.Var
-
-abstract trait VarDeferor {
-	def defer[A](`def` : Deferable[A]): Unit
-}
+import org.lodsb.reakt.property.VarDeferor
 
 case class Deferable[A](varDefer: VarDefering[A], value: A)
 
