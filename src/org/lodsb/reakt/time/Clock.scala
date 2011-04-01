@@ -32,7 +32,7 @@ package org.lodsb.reakt.time
 \*                                                                      */
 
 import java.util.{Timer, TimerTask, Date}
-import org.lodsb.reakt.{Signal, EventSource}
+import org.lodsb.reakt.async.{SignalA, EventSourceA}
 import org.lodsb.reakt.time.time.TimeValue
 import org.lodsb.reakt.time.time._
 
@@ -45,8 +45,8 @@ object Clock {
 	/**
 	 * An event stream that fires one event after the given time
 	 */
-	def in(t: Time): EventSource[TimeValue, Vortex] = {
-		val evt = new EventSource[TimeValue, Vortex](Vortex,Vortex);
+	def in(t: Time): EventSourceA[TimeValue, Vortex] = {
+		val evt = new EventSourceA[TimeValue, Vortex](Vortex,Vortex);
 		doIn(t) {
 			evt.emit(Now.apply)
 		}
@@ -57,8 +57,8 @@ object Clock {
 	/**
 	 * An event stream that fires one event after the given date
 	 */
-	def at(d: Date): EventSource[Date, Vortex] = {
-		val evt = new EventSource[Date, Vortex](Vortex, Vortex);
+	def at(d: Date): EventSourceA[Date, Vortex] = {
+		val evt = new EventSourceA[Date, Vortex](Vortex, Vortex);
 		doAt(d) {
 			evt.emit(d)
 		}
@@ -69,8 +69,8 @@ object Clock {
 	/**
 	 * An event stream that periodically fires an event
 	 */
-	def every(period: Time): EventSource[Unit, Vortex] = {
-		val evt = new EventSource[Unit, Vortex]((), Vortex);
+	def every(period: Time): EventSourceA[Unit, Vortex] = {
+		val evt = new EventSourceA[Unit, Vortex]((), Vortex);
 		doEvery(period) {
 			evt.emit(())
 		}
@@ -78,9 +78,9 @@ object Clock {
 		evt
 	}
 
-	def withResolution(period: Time): Signal[Time] = {
+	def withResolution(period: Time): SignalA[Time] = {
 		val t0 = (System.nanoTime nsecs)
-		val evt = new Signal[Time](0.0 nsecs)
+		val evt = new SignalA[Time](0.0 nsecs)
 		doEvery(period) {
 			evt.emit(((System.nanoTime nsecs) - t0))
 		}

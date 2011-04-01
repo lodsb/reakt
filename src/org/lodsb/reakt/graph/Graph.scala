@@ -25,12 +25,13 @@ package org.lodsb.reakt.graph
 import actors.Actor
 import java.util.Random
 import scala.collection.mutable.HashMap
-import org.lodsb.reakt.{Var, Reactive}
+import org.lodsb.reakt.{Reactive}
 import java.util.concurrent.atomic.{AtomicInteger, AtomicLong}
+import org.lodsb.reakt.async.VarA
 
 case class Edge(source: NodeBase[_], destination: NodeBase[_])
 
-case class Propagate[T](circle: Long, source: NodeBase[_], message: T)
+case class Propagate[T](cycle: Long, source: NodeBase[_], message: T)
 
 
 abstract class ReactiveGraph {
@@ -38,13 +39,15 @@ abstract class ReactiveGraph {
 	protected var nodes = List[NodeBase[_]]()
 }
 
-trait NodeBase[+T] extends Actor {
-	private var dependants = List[NodeBase[_]]()
-	private var dependson = new HashMap[NodeBase[_], Boolean]()
+trait NodeBase[+T] {
 
-	protected def onUpdateValue[B >: T](value: B): Unit = {}
+	protected var dependants = List[NodeBase[_]]()
+	protected var dependson = new HashMap[NodeBase[_], Boolean]()
 
-	private val depLock = new Object
+
+	protected def onUpdateValue[B >: T](value: B): Unit;
+
+	protected val depLock = new Object
 
 	def addDependant(d: NodeBase[_]): Unit = {
 		depLock.synchronized {
@@ -60,44 +63,66 @@ trait NodeBase[+T] extends Actor {
 		}
 	}
 
-	var cntr = 0;
+	private var cntr = 0;
 
-	def emit[T](m: T, c: Long = 0): Unit = {
-		//println("emit! "+m+" "+dependants.size);
-		dependants.foreach({
-			node => node ! Propagate(c, this, m)
-		})
+	def :<[A, B](sig1: NodeBase[A], sig2: NodeBase[B]): Unit = {
+		Reactive.connect(this, sig1)
+		Reactive.connect(this, sig2)
 	}
 
 	def emit[T](m: T): Unit = {
 		this.emit(m, Reactive.cycle)
 	}
 
+	def emit[T](m: T, c: Long = 0): Unit = {
+		//println("emit! "+m+" "+dependants.size);
+		println(dependants+" --- "+dependson+" +++ "+depLock)
+		dependants.foreach({
+			node => this.sendMessage(node, m, c)
+		})
+	}
+
+	protected def sendMessage[T](node: NodeBase[T], m: T, c: Long = 0): Unit = {
+		if (node.isInstanceOf[NodeAsynchronous[_]]) {
+			node.asInstanceOf[NodeAsynchronous[_]] ! Propagate(c, this, m)
+		} else if (node.isInstanceOf[NodeSynchronous[_]]) {
+			//TODO: DO MAGIC
+		}
+	}
+
+	protected def distributeMessage[Z](c: Long, s: NodeBase[_], msg: Z): Unit = {
+		depLock.synchronized {
+			if (dependson.size == 0) {
+				onUpdateValue(msg.asInstanceOf[T])
+
+				this.emit(msg, c)
+			} else if (dependson.contains(s)) {
+				cntr = cntr + 1;
+
+				if (cntr == dependson.size) {
+
+					onUpdateValue(msg.asInstanceOf[T])
+
+					this.emit(msg, c)
+
+					cntr = 0;
+				}
+			}
+		}
+	}
+
+}
+
+trait NodeSynchronous[T] extends NodeBase[T]
+
+trait NodeAsynchronous[T] extends Actor with NodeBase[T] {
+
 	def act() = {
 		loop {
 			react {
 				case p@Propagate(c, s, msg) => {
-					depLock.synchronized {
-						if (dependson.size == 0) {
-							onUpdateValue(msg.asInstanceOf[T])
-
-							this.emit(msg, c)
-						} else if (dependson.contains(s)) {
-							cntr = cntr + 1;
-
-							if (cntr == dependson.size) {
-
-								onUpdateValue(msg.asInstanceOf[T])
-
-								this.emit(msg, c)
-
-								cntr = 0;
-							}
-						}
-					}
+					this.distributeMessage(c, s, msg)
 				}
-
-
 				case _ => println("===????")
 			}
 		}
@@ -112,17 +137,17 @@ object Test {
 	def main(args: Array[String]) = {
 		val graph = Reactive
 
-		var sources = List[Var[Int]]()
+		var sources = List[VarA[Int]]()
 
 		for (i <- 0 to it) {
-			val s = new Var(i)
+			val s = new VarA(i)
 			sources ::= s
 			s.start
 		}
 
-		var destinations = List[Var[Int]]()
+		var destinations = List[VarA[Int]]()
 		for (i <- 0 to it) {
-			val d = new Var[Int](i * 3)
+			val d = new VarA[Int](i * 3)
 			destinations ::= d
 			d.start
 		}
@@ -132,9 +157,9 @@ object Test {
 			graph.connect(sources(i), destinations(i))
 		}
 
-		var destinations2 = List[Var[Int]]()
+		var destinations2 = List[VarA[Int]]()
 		for (i <- 0 to it) {
-			val d = new Var[Int](i * 23)
+			val d = new VarA[Int](i * 23)
 			destinations2 ::= d
 			d.start
 		}
@@ -184,7 +209,7 @@ object Test {
 				"END"
 			}
 		}*/
-		val end = new Var[Int](12); //new org.lodsb.reaktExt.Reactive.Signal[Int](123)
+		val end = new VarA[Int](12); //new org.lodsb.reaktExt.Reactive.Signal[Int](123)
 		end.start
 
 		for (i <- 0 to it) {
@@ -206,8 +231,8 @@ object Test {
 			true
 		});
 
-		val a = new Var[Int](12);
-		val b = new Var[Int](12);
+		val a = new VarA[Int](12);
+		val b = new VarA[Int](12);
 
 
 		val sdf = 1

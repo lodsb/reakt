@@ -22,15 +22,17 @@
 
 package org.lodsb.reakt.property
 
-import org.lodsb.reakt.Var
+
 import org.lodsb.reakt.property.VarDeferor
+import org.lodsb.reakt.async.VarA
 
 case class Deferable[A](varDefer: VarDefering[A], value: A)
 
-class VarDefering[A](protected val deferor: VarDeferor,  value: A) extends Var[A](value) {
+class VarDefering[A](protected val deferor: VarDeferor,  value: A) extends VarA[A](value) {
 
-	def updateCallback(newValue: A) = if (_value != newValue) {
-		_value = newValue
+	def updateCallback(newValue: A) = if (this.value != newValue) {
+		//TODO: FIXME POSSIBLE BUG
+		this._defValue = newValue
 		this.onUpdateValue(newValue)
 		this.emit(newValue)
 	}

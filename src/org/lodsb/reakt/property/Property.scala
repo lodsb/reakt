@@ -1,5 +1,3 @@
-import org.mt4j.util.math.Vector3D
-
 /*
  +1>>  This source code is licensed as GPLv3 if not stated otherwise.
 	>>  NO responsibility taken for ANY harm, damage done
@@ -24,7 +22,7 @@ import org.mt4j.util.math.Vector3D
 
 package org.lodsb.reakt.property {
 
-import org.lodsb.reakt.Val
+import org.lodsb.reakt.async.ValA
 
 object PropertyObserver {
 
@@ -39,11 +37,11 @@ class Property[T](deferor: VarDeferor, name: String, init: T, val set: (T) => Un
 		super.updateCallback(get())
 	}
 
-	override def toString() = "Property: " + name + " value: " + this._value + "\n" + super.toString
+	override def toString() = "Property: " + name + " value: " + this.value + "\n" + super.toString
 
 }
 
-class Attribute[T](val name: String, _value: T) extends Val[T](_value) {
+class Attribute[T](val name: String, _value: T) extends ValA[T](_value) {
 
 	def update(newValue: T) = {
 		this.onUpdateValue(newValue)

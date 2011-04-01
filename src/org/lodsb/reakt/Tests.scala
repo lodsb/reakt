@@ -21,20 +21,22 @@
  */
 
 package org.lodsb.reakt
+
+import async.VarA
 import org.lodsb.reakt.ConstantSignal._
 
 
 object Tests {
 	def main(args: Array[String]) = {
 
-		val x = new Var[Int](5)
-		val z = new Var[String](" WORLD")
+		val x = new VarA[Int](5)
+		val z = new VarA[String](" WORLD")
 
 		x.observe(x => {println(x); true})
 		x.start;
 
-		val y = new Var[Int](0)
-		val u = new Var[Int](2000)
+		val y = new VarA[Int](0)
+		val u = new VarA[Int](2000)
 		u.start
 		y.start
 

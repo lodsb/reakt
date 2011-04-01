@@ -23,7 +23,7 @@
 
 package org.lodsb.reakt
 
-class Var[T](_value: T) extends Val[T](_value) {
+trait TVar[T] extends TVal[T] {
 
 	//override def action(msg: T) = this.emit(msg)
 
@@ -32,7 +32,7 @@ class Var[T](_value: T) extends Val[T](_value) {
 		this.emit(newValue)
 	}
 
-	def <~[B <: T](that: Signal[B]) : Signal[B] = {
+	def <~[B <: T](that: TSignal[B]) : TSignal[B] = {
 		that.observe({x => this() = x ;true})
 
 		that
