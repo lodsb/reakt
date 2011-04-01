@@ -1,0 +1,1 @@
+scala signals/dataflow programming based/inspired by the paper "Deprecating the observer-pattern". Supports various operations and transformations of signals. Signals can be either synchronous or asynchronous using scala's Actors for e.g. communicating across thread-bounds (gui, i/o etc).
