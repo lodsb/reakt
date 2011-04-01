@@ -102,16 +102,6 @@ trait TReactive[DefinedType, UndefinedType]
 		this.emit(this.value.merge)
 	}
 
-	/* TODO:FIXME!
-	override def start : Actor = {
-
-		val actor = super.start
-
-		this.bang
-
-		actor
-	}*/
-
 	protected[reakt] def defAndUndeValues: Tuple2[DefinedType,UndefinedType] = (this._defValue, this._undefValue)
 
 	def value: Either[DefinedType, UndefinedType] = {
@@ -130,32 +120,6 @@ trait TReactive[DefinedType, UndefinedType]
 
 trait TSignalet[+ValueType] extends TObservableValue[ValueType, ValueType]
 
-//  TODO  move somewhere else!
-object ConstantSignal {
-	implicit def something2ConstantSignal[SC](something: SC) = new ConstantSignal(something)
-}
-
-// TODO: FIXME: Covariance!
-class ConstantSignal[T](initial: T) extends TSignal[T] {
-	val init = initial;
-	var defaultUndefValue = init;
-	var defaultDefValue   = init;
-
-	override def value: Either[T, T] = Left(initial)
-	def emit[T](m: T): Unit = {}
-	def emit[T](m: T, c: Long = 0): Unit = {}
-
-
-	def observe(observerFun: T => Boolean): Unit = {}
-
-	def map[B](f: T => B): TSignal[B] = {
-		new ConstantSignal(f(this.value.merge))
-	}
-
-	protected def createBinOpSignal[A, B, C](sig1: TSignalet[A], sig2: TSignalet[B], binOpFun: 	(A, B) => C): TSignal[C] = new BinOpSignalA(sig1, sig2, binOpFun);
-}
-
-
 trait TSignal[ValueType] extends TReactive[ValueType, ValueType] with TSignalet[ValueType] {
 	protected val init: ValueType;
 
@@ -170,8 +134,6 @@ trait TSignal[ValueType] extends TReactive[ValueType, ValueType] with TSignalet[
 	}
 
 	def apply(): ValueType = this.value.merge
-
-	//TODO :FIXME synch& asynch
 
 	protected def createBinOpSignal[A,B,C](sig1: TSignalet[A], sig2: TSignalet[B], binOpFun: (A, B) => C) : TSignal[C]
 
@@ -208,7 +170,7 @@ trait TSignal[ValueType] extends TReactive[ValueType, ValueType] with TSignalet[
 	def max(that: TSignalet[ValueType])(implicit numeric5: Numeric[ValueType]) =
 		createBinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric5.max(x, y))
 
-	//FIXME: where is it called from?
+	//TODO:FIXME: where is it called from?
 	//def ==(that: TSignalet[ValueType])(implicit numeric6: Numeric[ValueType]) =
 	//	createBinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric6.equiv(x, y))
 
@@ -231,3 +193,35 @@ trait TSignal[ValueType] extends TReactive[ValueType, ValueType] with TSignalet[
 }
 
 trait TEventSource[ValueType, UndefValueType] extends TReactive[ValueType, UndefValueType]
+
+abstract class BinOpSignal[A, B, C](private val sig1: TSignalet[A], private val sig2: TSignalet[B],
+											 private val binOpFun: (A, B) => C)
+	extends TSignal[C] {
+
+	val init = binOpFun(sig1.value.merge, sig2.value.merge)
+	var defaultDefValue = init;
+	var defaultUndefValue = init;
+	val reactive = this;
+
+	sig1.observe(updateA)
+	sig2.observe(updateB)
+
+	var a: A = sig1.value.merge;
+	var b: B = sig2.value.merge;
+
+	private def updateA(x: A): Boolean = {
+		a = x;
+		this.emitBinOpResult
+		true;
+	}
+
+	private def updateB(x: B): Boolean = {
+		b = x;
+		this.emitBinOpResult
+		true;
+	}
+
+	private def emitBinOpResult = {
+		this.emit(this.binOpFun(a, b))
+	}
+}

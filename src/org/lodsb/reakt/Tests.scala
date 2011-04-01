@@ -24,6 +24,7 @@ package org.lodsb.reakt
 
 import async.VarA
 import org.lodsb.reakt.ConstantSignal._
+import sync.VarS
 
 
 object Tests {
@@ -35,10 +36,10 @@ object Tests {
 		x.observe(x => {println(x); true})
 		x.start;
 
-		val y = new VarA[Int](0)
+		val y = new VarS[Int](0)
 		val u = new VarA[Int](2000)
 		u.start
-		y.start
+		y
 
 		y <~ x + u + 10000000;
 

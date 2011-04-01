@@ -75,8 +75,6 @@ trait NodeBase[+T] {
 	}
 
 	def emit[T](m: T, c: Long = 0): Unit = {
-		//println("emit! "+m+" "+dependants.size);
-		println(dependants+" --- "+dependson+" +++ "+depLock)
 		dependants.foreach({
 			node => this.sendMessage(node, m, c)
 		})
@@ -86,7 +84,7 @@ trait NodeBase[+T] {
 		if (node.isInstanceOf[NodeAsynchronous[_]]) {
 			node.asInstanceOf[NodeAsynchronous[_]] ! Propagate(c, this, m)
 		} else if (node.isInstanceOf[NodeSynchronous[_]]) {
-			//TODO: DO MAGIC
+			node.distributeMessage(c, this, m)
 		}
 	}
 
@@ -123,7 +121,7 @@ trait NodeAsynchronous[T] extends Actor with NodeBase[T] {
 				case p@Propagate(c, s, msg) => {
 					this.distributeMessage(c, s, msg)
 				}
-				case _ => println("===????")
+				case _ => System.err.println("Message type not understood!")
 			}
 		}
 	}
