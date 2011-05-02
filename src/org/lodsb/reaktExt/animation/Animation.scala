@@ -24,7 +24,7 @@ package org.lodsb.reaktExt.animation
 
 import org.mt4j.MTApplication
 import de.looksgood.ani._
-import org.lodsb.reakt.Val
+import org.lodsb.reakt.async.ValA
 import reaktExt.animation.InterpolatingAnimationTarget
 import org.lodsb.reaktExt._
 import java.util.{TimerTask, Timer}
@@ -127,7 +127,7 @@ object Animation {
 class InterpolatingAnimation(from: Float, to: Float, duration: Float = 60f, easing: AnimationEasing = Linear,
 							 repeat: Int = 0, delay: Float = 0.0f, timeResolutionMsecs: Long = 50)
 
-	extends Val[Float](from)
+	extends ValA[Float](from)
 	with Animation {
 
 	private val target = new InterpolatingAnimationTarget();

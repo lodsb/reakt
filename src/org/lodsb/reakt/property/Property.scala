@@ -43,6 +43,7 @@ class Property[T](deferor: VarDeferor, name: String, init: T, val set: (T) => Un
 
 class Attribute[T](val name: String, _value: T) extends ValA[T](_value) {
 
+	this.update(_value);
 	def update(newValue: T) = {
 		this.onUpdateValue(newValue)
 		this.emit(newValue)

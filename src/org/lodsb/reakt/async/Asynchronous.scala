@@ -26,7 +26,7 @@ import org.lodsb.reakt.graph.NodeAsynchronous
 import org.lodsb.reakt._
 import actors.Actor
 
-protected[reakt] class BinOpSignalA[A, B, C](sig1: TSignalet[A], sig2: TSignalet[B], 											  binOpFun: (A, B) => C) extends BinOpSignal[A,B,C](sig1, sig2, binOpFun)  with NodeObservableAsynchronous[C, C]
+protected[reakt] class BinOpSignalA[A, B, C](sig1: TSignalet[A], sig2: TSignalet[B], 											  bOpFun: (A, B) => C) extends BinOpSignal[A,B,C](sig1, sig2, bOpFun)  with NodeObservableAsynchronous[C, C]
 
 trait NodeObservableAsynchronous[DefinedType, UndefinedType] extends NodeAsynchronous[DefinedType] {
 	protected[async] val reactive: TReactive[DefinedType, UndefinedType];
