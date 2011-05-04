@@ -1,4 +1,4 @@
-package org.lodsb.reakt.util.timer.sequence.timerclock.nativelinux;
+package org.lodsb.reakt.util.time.sequence.timerclock.nativelinux;
 
 import java.io.File;
 
