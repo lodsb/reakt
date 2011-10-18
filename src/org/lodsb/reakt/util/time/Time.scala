@@ -24,7 +24,7 @@ package org.lodsb.reakt.time
 
 import org.lodsb.reakt.time.time.TimeValue
 import org.lodsb.reakt.time.time._
-import java.util.Date
+import java.util.{Calendar, Date}
 
 //original from:
 /*                     __                                               *\
@@ -76,19 +76,19 @@ object Now extends TimeValue {
 	def nsecs = this.apply.nsecs
 
 	def apply = {
-		val v = System.nanoTime * 1000.0
+		val v = Calendar.getInstance
 		new TimeValue {
-			def days = new Time(v * days2Secs)
+			def days = new Time(v.get(Calendar.DAY_OF_YEAR) * days2Secs)
 
-			def hours = new Time(v * hours2Secs)
+			def hours = new Time(v.get(Calendar.HOUR_OF_DAY) * hours2Secs)
 
-			def mins = new Time(v * mins2Secs)
+			def mins = new Time(v.get(Calendar.MINUTE) * mins2Secs)
 
-			def secs = new Time(v)
+			def secs = new Time(v.get(Calendar.SECOND));
 
-			def msecs = new Time(v * msecs2Secs)
+			def msecs = new Time(System.nanoTime*1000.0*1000.0 * msecs2Secs)
 
-			def nsecs = new Time(v * nsecs2Secs)
+			def nsecs = new Time(System.nanoTime * nsecs2Secs)
 		}
 	}
 }

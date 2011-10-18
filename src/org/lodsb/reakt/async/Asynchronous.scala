@@ -82,6 +82,11 @@ class SignalA[T](initialValue: T) extends TSignal[T] with NodeObservableAsynchro
 	val reactive = this;
 }
 
+class IOA[T](initI: T, initO: T) extends TIO[T] {
+	val out = new ValA[T](initO)
+	val in = new VarA[T](initI)
+}
+
 class ValA[T](initialValue: T) extends TVal[T] with NodeObservableAsynchronous[T, T] {
 	val init = initialValue;
 	var defaultDefValue = init;

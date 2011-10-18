@@ -39,6 +39,7 @@ class ConstantSignal[T](initial: T) extends TSignal[T] {
 	override def value: Either[T, T] = Left(initial)
 	def emit[T](m: T): Unit = {}
 	def emit[T](m: T, c: Long = 0): Unit = {}
+	def emitLocal[T](m: T): Unit = {}
 
 
 	def observe(observerFun: T => Boolean): Unit = {}

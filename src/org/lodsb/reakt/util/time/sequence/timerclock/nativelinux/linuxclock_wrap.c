@@ -194,7 +194,7 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 extern "C" {
 #endif
 
-SWIGEXPORT void JNICALL Java_org_lodsb_reakt_util_time_timerclock_nativelinux_linuxclockJNI_set_1ticktime_1nanos(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT void JNICALL Java_util_time_sequence_timerclock_nativelinux_linuxclockJNI_set_1ticktime_1nanos(JNIEnv *jenv, jclass jcls, jint jarg1) {
   int arg1 ;
   
   (void)jenv;
@@ -204,14 +204,14 @@ SWIGEXPORT void JNICALL Java_org_lodsb_reakt_util_time_timerclock_nativelinux_li
 }
 
 
-SWIGEXPORT void JNICALL Java_org_lodsb_reakt_util_time_timerclock_nativelinux_linuxclockJNI_next_1tick(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT void JNICALL Java_util_time_sequence_timerclock_nativelinux_linuxclockJNI_next_1tick(JNIEnv *jenv, jclass jcls) {
   (void)jenv;
   (void)jcls;
   next_tick();
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_lodsb_reakt_util_time_timerclock_nativelinux_linuxclockJNI_scheduleRealtime(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jint JNICALL Java_util_time_sequence_timerclock_nativelinux_linuxclockJNI_scheduleRealtime(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jint jresult = 0 ;
   int arg1 ;
   int result;
@@ -225,7 +225,7 @@ SWIGEXPORT jint JNICALL Java_org_lodsb_reakt_util_time_timerclock_nativelinux_li
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_lodsb_reakt_util_time_timerclock_nativelinux_linuxclockJNI_scheduleFIFO(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jint JNICALL Java_util_time_sequence_timerclock_nativelinux_linuxclockJNI_scheduleFIFO(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jint jresult = 0 ;
   int arg1 ;
   int result;
@@ -239,7 +239,7 @@ SWIGEXPORT jint JNICALL Java_org_lodsb_reakt_util_time_timerclock_nativelinux_li
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_lodsb_reakt_util_time_timerclock_nativelinux_linuxclockJNI_scheduleOther(JNIEnv *jenv, jclass jcls, jint jarg1) {
+SWIGEXPORT jint JNICALL Java_util_time_sequence_timerclock_nativelinux_linuxclockJNI_scheduleOther(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jint jresult = 0 ;
   int arg1 ;
   int result;
@@ -253,7 +253,7 @@ SWIGEXPORT jint JNICALL Java_org_lodsb_reakt_util_time_timerclock_nativelinux_li
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_lodsb_reakt_util_time_timerclock_nativelinux_linuxclockJNI_getScheduler(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_util_time_sequence_timerclock_nativelinux_linuxclockJNI_getScheduler(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   
@@ -265,7 +265,7 @@ SWIGEXPORT jint JNICALL Java_org_lodsb_reakt_util_time_timerclock_nativelinux_li
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_lodsb_reakt_util_time_timerclock_nativelinux_linuxclockJNI_getPriority(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_util_time_sequence_timerclock_nativelinux_linuxclockJNI_getPriority(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
   

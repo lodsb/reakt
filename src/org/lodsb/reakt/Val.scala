@@ -22,3 +22,8 @@
 
 package org.lodsb.reakt
 trait TVal[T] extends TSignal[T]
+
+trait TIO[T] {
+	val out: TVal[T];
+	val in: TVar[T];
+}

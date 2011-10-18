@@ -65,6 +65,11 @@ class SignalS[T](initialValue: T) extends TSignal[T] with NodeObservableSynchron
 	val reactive = this;
 }
 
+class IOS[T](initI: T, initO: T) extends TIO[T] {
+	val out = new ValS[T](initO)
+	val in = new VarS[T](initI)
+}
+
 class ValS[T](initialValue: T) extends TVal[T] with NodeObservableSynchronous[T, T] {
 	val init = initialValue;
 	var defaultDefValue = init;

@@ -1,10 +1,10 @@
-/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+/*
  +1>>  This source code is licensed as GPLv3 if not stated otherwise.
     >>  NO responsibility taken for ANY harm, damage done
     >>  to you, your data, animals, etc.
     >>
   +2>>
-    >>  Last modified:  2011 - 5 - 4 :: 6 : 56
+    >>  Last modified:  2011 - 5 - 5 :: 2 : 20
     >>  Origin: mt4j (project) / mt4j_mod (module)
     >>
   +3>>
@@ -18,11 +18,17 @@
     >>
   +4>>
     >>  Made in Bavaria by fat little elves - since 1983.
- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
+ */
 
-package util.time.sequence;
+package util.time.sequence.timerclock
 
-public interface SequencerInterface {
-	//void postSequenceEvent(SequenceEvent sequenceEvent);
-	public boolean processTick(long tick);
+import nativelinux.HighResolutionLinuxClock
+
+
+object HighResolutionClock {
+	def createClock : ClockInterface = {
+		//TODO: add different clocks etc
+
+		new HighResolutionLinuxClock();
+	}
 }

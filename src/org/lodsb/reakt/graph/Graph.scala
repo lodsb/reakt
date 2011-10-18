@@ -27,7 +27,8 @@ import java.util.Random
 import scala.collection.mutable.HashMap
 import org.lodsb.reakt.{Reactive}
 import java.util.concurrent.atomic.{AtomicInteger, AtomicLong}
-import org.lodsb.reakt.async.VarA
+import org.lodsb.reakt.sync.{NodeObservableSynchronous, ObserverReactiveS}
+import org.lodsb.reakt.async.{NodeObservableAsynchronous, VarA}
 
 case class Edge(source: NodeBase[_], destination: NodeBase[_])
 
@@ -79,6 +80,27 @@ trait NodeBase[+T] {
 			node => this.sendMessage(node, m, c)
 		})
 	}
+
+	def emitExcept[T](m: T, node: NodeBase[_]): Unit = {
+		this.emitExcept(m, node, Reactive.cycle)
+	}
+
+	def emitExcept[T](m: T, n: NodeBase[_], c: Long = 0): Unit = {
+		dependants.foreach({
+			node => if (node != n) {
+				this.sendMessage(node, m, c)
+			}
+		})
+	}
+
+	def emitOnly[T](m: T, node: NodeBase[_]): Unit = {
+		this.emitOnly(m, node, Reactive.cycle)
+	}
+
+	def emitOnly[T](m: T, n: NodeBase[_], c: Long = 0): Unit = {
+		this.sendMessage(n, m, c)
+	}
+
 
 	protected def sendMessage[T](node: NodeBase[T], m: T, c: Long = 0): Unit = {
 		if (node.isInstanceOf[NodeAsynchronous[_]]) {

@@ -6,7 +6,7 @@
  * the SWIG interface file instead.
  * ----------------------------------------------------------------------------- */
 
-package org.lodsb.reakt.util.time.timerclock.nativelinux;
+package util.time.sequence.timerclock.nativelinux;
 
 public class linuxclock {
   public static void set_ticktime_nanos(int nanos) {

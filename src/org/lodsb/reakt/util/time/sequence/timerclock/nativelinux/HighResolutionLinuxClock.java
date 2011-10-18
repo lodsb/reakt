@@ -1,6 +1,9 @@
-package org.lodsb.reakt.util.time.sequence.timerclock.nativelinux;
+package util.time.sequence.timerclock.nativelinux;
 
 import java.io.File;
+
+import util.time.sequence.SequencerInterface;
+import util.time.sequence.timerclock.ClockInterface;
 
 public class HighResolutionLinuxClock implements ClockInterface, Runnable {
 
@@ -10,8 +13,9 @@ public class HighResolutionLinuxClock implements ClockInterface, Runnable {
 
 	public HighResolutionLinuxClock(SequencerInterface sequencer) {
 		this.sequencer = sequencer;
-
 	}
+
+	public HighResolutionLinuxClock(){}
 
 	//FIXME: fix path
 	static {
@@ -23,7 +27,7 @@ public class HighResolutionLinuxClock implements ClockInterface, Runnable {
 		} catch (Throwable e) {
 			try {
 				//File file = new File("lib/"+System.getProperty("os.arch")+"/"+System.getProperty("os.name")+"/linuxclock.so");
-				File file = new File("src/org/lodsb/lzrcore/linuxclock/linuxclock.so");
+				File file = new File("libraries/reakt/src/org/lodsb/reakt/util/time/sequence/timerclock/nativelinux/linuxclock.so");
 
 				absolutePath = file.getAbsolutePath();
 				System.load(absolutePath);
@@ -37,25 +41,24 @@ public class HighResolutionLinuxClock implements ClockInterface, Runnable {
 		}
 	}
 
-	private int numberOfLatencyMeasurements = 100000;
+	private int numberOfLatencyMeasurements = 10;
 	private int numberOfMeanLatencyMeasurements = 10;
 
 	private int currentLatencyMeasurement = 0;
 	private int currentMeanLatencyMeasurement = 0;
-	private long interval = 0;
+	private int interval = 0;
 
 	private long currentTick = 0;
 
-	private long[] latencyMeasurements = new long[numberOfLatencyMeasurements];
-	private long[] meanLatencyMeasurements = new long[numberOfMeanLatencyMeasurements];
+	private int[] latencyMeasurements = new int[numberOfLatencyMeasurements];
+	private int[] meanLatencyMeasurements = new int[numberOfMeanLatencyMeasurements];
 
-	private void updateLatency(long currentMeasurement) {
-		long currentLatency = currentMeasurement - interval;
+	private void updateLatency(int currentLatency) {
 
 		latencyMeasurements[currentLatencyMeasurement] = currentLatency;
 
 		if (currentLatencyMeasurement == 0) {
-			long meanLatency = 0;
+			int meanLatency = 0;
 
 			for (long val : latencyMeasurements) {
 				meanLatency += val;
@@ -65,15 +68,17 @@ public class HighResolutionLinuxClock implements ClockInterface, Runnable {
 
 			meanLatencyMeasurements[currentMeanLatencyMeasurement] = meanLatency;
 
-			meanLatency = 0;
-			//if(currentMeanLatencyMeasurement == 0) {
-			for (long val : meanLatencyMeasurements) {
-				meanLatency += val;
+			if (currentMeanLatencyMeasurement == 0) {
+				meanLatency = 0;
+				//if(currentMeanLatencyMeasurement == 0) {
+				for (long val : meanLatencyMeasurements) {
+					meanLatency += val;
+				}
+
+				meanLatency = meanLatency / numberOfMeanLatencyMeasurements;
+
+				linuxclock.set_ticktime_nanos((int)((interval - meanLatency)));
 			}
-
-			meanLatency = meanLatency / numberOfMeanLatencyMeasurements;
-
-			linuxclock.set_ticktime_nanos((int) (interval - meanLatency));
 
 			//}	
 
@@ -126,7 +131,8 @@ public class HighResolutionLinuxClock implements ClockInterface, Runnable {
 
 	@Override
 	public void setInterval(long intervalNanos) {
-		this.interval = intervalNanos;
+		// FIXME: add errorhandling for intervals > maxint
+		this.interval = (int) ((double)intervalNanos);
 		linuxclock.set_ticktime_nanos((int) intervalNanos);
 	}
 
@@ -156,6 +162,11 @@ public class HighResolutionLinuxClock implements ClockInterface, Runnable {
 	@Override
 	public void run() {
 
+		if(this.sequencer == null) {
+			System.err.println("[ERROR] No Sequencer set!");
+			return;
+		}
+
 		if (priorityRequested != priority) {
 			System.err.println("[INFO] Clock priority requested " + priorityRequested);
 
@@ -170,8 +181,7 @@ public class HighResolutionLinuxClock implements ClockInterface, Runnable {
 			clockStart = System.nanoTime();
 			linuxclock.next_tick();
 			sequencer.processTick(currentTick++);
-
-			this.updateLatency(System.nanoTime() - clockStart);
+			this.updateLatency((int)((System.nanoTime() - clockStart) - interval));
 		}
 	}
 
@@ -181,15 +191,9 @@ public class HighResolutionLinuxClock implements ClockInterface, Runnable {
 
 		SequencerInterface si = new SequencerInterface() {
 			@Override
-			public void postSequenceEvent(SequenceEvent sequenceEvent) {
-				//To change body of implemented methods use File | Settings | File Templates.
-			}
-
-
-			@Override
 			public boolean processTick(long tick) {
 				ticks++;
-				return true;  //To change body of implemented methods use File | Settings | File Templates.
+				return true;
 			}
 		};
 
@@ -203,7 +207,7 @@ public class HighResolutionLinuxClock implements ClockInterface, Runnable {
 
 
 		try {
-			Thread.sleep(10000);
+			Thread.sleep(1000*10);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
