@@ -62,6 +62,11 @@ class SignalS[T](initialValue: T) extends TSignal[T] with NodeObservableSynchron
 	var defaultDefValue = init;
 	var defaultUndefValue = init;
 
+	/**argh, should be done in a more beautiful manner**/
+	this._defValue = init;
+	this._undefValue=init;
+
+
 	val reactive = this;
 }
 
@@ -75,6 +80,11 @@ class ValS[T](initialValue: T) extends TVal[T] with NodeObservableSynchronous[T,
 	var defaultDefValue = init;
 	var defaultUndefValue = init;
 
+	/**argh, should be done in a more beautiful manner**/
+	this._defValue = init;
+	this._undefValue=init;
+
+
 	val reactive = this;
 }
 
@@ -82,6 +92,11 @@ class VarS[T](initialValue: T) extends TVar[T] with NodeObservableSynchronous[T,
 	val init = initialValue;
 	var defaultDefValue = init;
 	var defaultUndefValue = init;
+
+	/**argh, should be done in a more beautiful manner**/
+	this._defValue = init;
+	this._undefValue=init;
+
 
 	val reactive = this;
 }

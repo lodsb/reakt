@@ -21,6 +21,8 @@
  */
 
 package org.lodsb.reakt.graph
+
+// TODO: !!!
 // stuff you should be able to do
 // have some nodes, register them with a String as "local service"
 // send message to several nodes ala
@@ -36,22 +38,23 @@ trait GlobalMessage {
 
 
 trait GlobalMessageReceiver {
-	def registerMeAs(name: String) : None = {
+	// why again?!
+	def registerMeAs(name: String) = {
 
 
 	}
 
-	def receive(message: Any) : None
+	def receive(message: Any)  = {}
 
 }
 
 
 // message singleton
 object GlobalMessageService {
-	def registerMessageReceiver(name: String, receiver: GlobalMessageReceiver) : None = {
+	def registerMessageReceiver(name: String, receiver: GlobalMessageReceiver) = {
 
 	}
 
-	def send(name: String, value: Any) : None = {}
+	def send(name: String, value: Any) = {}
 
 }

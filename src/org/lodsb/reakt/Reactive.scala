@@ -125,6 +125,8 @@ trait TSignal[ValueType] extends TReactive[ValueType, ValueType] with TSignalet[
 
 	this.defaultDefValue 	= init;
 	this.defaultUndefValue 	= init;
+	this._defValue 	= init;
+	this._undefValue 	= init;
 
 	// publish initial value
 	//this.emit(init)
@@ -156,7 +158,7 @@ trait TSignal[ValueType] extends TReactive[ValueType, ValueType] with TSignalet[
 		createBinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric1.plus(x, y))
 
 	def +(that: TSignalet[String]) =
-		createBinOpSignal(this, that, (x: ValueType, y: String) => x.toString + y)
+		createBinOpSignal(this, that, (x: ValueType, y: String) => x+""+ y)
 
 	def -(that: TSignalet[ValueType])(implicit numeric2: Numeric[ValueType]) =
 		createBinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric2.minus(x, y))

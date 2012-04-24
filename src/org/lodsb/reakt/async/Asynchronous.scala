@@ -23,8 +23,8 @@
 package org.lodsb.reakt.async
 
 import org.lodsb.reakt.graph.NodeAsynchronous
-import org.lodsb.reakt._
 import actors.Actor
+import org.lodsb.reakt._
 
 protected[reakt] class BinOpSignalA[A, B, C](sig1: TSignalet[A], sig2: TSignalet[B], 											  bOpFun: (A, B) => C) extends BinOpSignal[A,B,C](sig1, sig2, bOpFun)  with NodeObservableAsynchronous[C, C]
 
@@ -79,6 +79,10 @@ class SignalA[T](initialValue: T) extends TSignal[T] with NodeObservableAsynchro
 	var defaultDefValue = init;
 	var defaultUndefValue = init;
 
+	/**argh, should be done in a more beautiful manner**/
+	this._defValue = init;
+	this._undefValue=init;
+
 	val reactive = this;
 }
 
@@ -92,6 +96,11 @@ class ValA[T](initialValue: T) extends TVal[T] with NodeObservableAsynchronous[T
 	var defaultDefValue = init;
 	var defaultUndefValue = init;
 
+	/**argh, should be done in a more beautiful manner**/
+	this._defValue = init;
+	this._undefValue=init;
+
+
 	val reactive = this;
 }
 
@@ -99,6 +108,11 @@ class VarA[T](initialValue: T) extends TVar[T] with NodeObservableAsynchronous[T
 	val init = initialValue;
 	var defaultDefValue = init;
 	var defaultUndefValue = init;
+
+	/**argh, should be done in a more beautiful manner**/
+	this._defValue = init;
+	this._undefValue=init;
+
 
 	val reactive = this;
 }

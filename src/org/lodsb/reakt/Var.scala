@@ -32,7 +32,7 @@ trait TVar[T] extends TVal[T] {
 		this.emit(newValue)
 	}
 
-	def <~[B <: T](that: TSignal[B]) : TSignal[B] = {
+	def <~[B <% T](that: TSignal[B]) : TSignal[B] = {
 		that.observe({x => this() = x ;true})
 
 		that
