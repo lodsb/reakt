@@ -1,6 +1,11 @@
 name := "reakt"
 
+organization := "org.lodsb"
+
+version := "0.1-SNAPSHOT"
+
 scalaVersion := "2.9.2"
+
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-Dfile.encoding=ISO-8859-1") //, "-Xprint:typer")
 
@@ -12,4 +17,7 @@ scalacOptions <++= scalaVersion map { version =>
   	Seq("-Ydependent-method-types")
  	else Nil
 }
+
+unmanagedClasspath in Compile += Attributed.blank(new java.io.File("doesnotexist"))
+
 
