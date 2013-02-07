@@ -33,6 +33,10 @@ class Property[T](deferor: VarDeferor, name: String, init: T, val set: (T) => Un
 
 	override def toString() = "Property: " + name + " value: " + this.value + "\n" + super.toString
 
+	def :=(value:T) = set(value)
+
+	override def apply() = get()
+
 }
 
 class Attribute[T](val name: String, _value: T) extends ValA[T](_value) {
