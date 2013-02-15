@@ -38,8 +38,6 @@ trait TVar[T] extends TVal[T] {
 
 
 	def <~[B <% T](that: TSignal[B]) : TSignal[B] = {
-    println("dododododo "+ this+" x "+that)
-    println(Reactive)
 
 		val a = that.observe({x => this() = x ;true})
 
@@ -50,9 +48,6 @@ trait TVar[T] extends TVal[T] {
 
       Reactive.fakeConnect(obs,thi);
     }
-
-    println("----")
-    println(Reactive)
 
 		that
 	}

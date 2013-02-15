@@ -51,7 +51,6 @@ object Reactive extends ReactiveGraph {
   }
 
 	def disconnectSingle[T<:NodeBase[_]](source: T, destination: T) =  {
-    println("disconnect "+source+" "+destination)
     graphLock.synchronized {
 
       _disconnect(source,destination)
@@ -64,7 +63,6 @@ object Reactive extends ReactiveGraph {
   // disconnects a path of nodes
   //
   def disconnect[T<:NodeBase[_]](source: T, destination: T) = {
-     println("disconnect P"+source+" "+destination)
     graphLock.synchronized{
       _path(source,destination,{
         (x,y) => this._disconnect(x, y)
