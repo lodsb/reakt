@@ -35,7 +35,7 @@ class Property[T](deferor: VarDeferor, name: String, init: T, val set: (T) => Un
 
 	def :=(value:T) = set(value)
 
-	override def apply() = get()
+	override def apply() = {println("dsdfsdfsfd"); get()}
 
 }
 

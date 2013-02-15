@@ -30,11 +30,13 @@ class BinOpSignalS[A, B, C](sig1: TSignalet[A], sig2: TSignalet[B], 											 
 trait NodeObservableSynchronous[DefinedType, UndefinedType] extends NodeSynchronous[DefinedType] {
 	protected[sync] val reactive: TReactive[DefinedType, UndefinedType];
 
-	def observe(observerFun: DefinedType => Boolean): Unit = {
+	def observe(observerFun: DefinedType => Boolean) = {
 		val (defV, undefV) = reactive.defAndUndeValues
 		val observerReactive = new ObserverReactiveS[DefinedType, UndefinedType](defV, undefV, observerFun);
 
 		Reactive.connect(this, observerReactive)
+
+    observerReactive
 	}
 
 	protected def createBinOpSignal[A, B, C](sig1: TSignalet[A], sig2: TSignalet[B], binOpFun: (A, B) => C): TSignal[C] = {

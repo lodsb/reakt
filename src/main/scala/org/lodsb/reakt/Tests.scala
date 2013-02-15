@@ -23,7 +23,7 @@
 package org.lodsb.reakt
 
 import async.VarA
-import org.lodsb.reakt.ConstantSignal._
+import org.lodsb.reakt.Implicits._
 import sync.VarS
 
 
@@ -33,7 +33,7 @@ object Tests {
 		val x = new VarA[Int](5)
 		val z = new VarA[String](" WORLD")
 
-		x.observe(x => {println(x); true})
+		x.observe({ff => println(ff); true})
 		x.start;
 
 		val y = new VarS[Int](0)

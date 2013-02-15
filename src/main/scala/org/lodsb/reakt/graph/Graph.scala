@@ -36,14 +36,65 @@ case class Propagate[T](cycle: Long, source: NodeBase[_], message: T)
 
 
 abstract class ReactiveGraph {
-	protected var edges = List[Edge]()
-	protected var nodes = List[NodeBase[_]]()
+  import scalax.collection.mutable.Graph
+  import scalax.collection.GraphPredef._
+  import scalax.collection.GraphEdge._
+
+  private val graph = Graph[NodeBase[_],UnDiEdge]();
+
+  protected[reakt] def _connect(source: NodeBase[_], destination: NodeBase[_]) = {
+    graph.add(source);
+    graph.add(destination);
+
+    graph.add(source~destination)
+
+  }
+
+  protected[reakt] def _disconnect(source: NodeBase[_], destination: NodeBase[_]) = {
+    val edge = source~destination
+    graph.remove(edge)
+  }
+
+  protected[reakt] def _predecessors(node: NodeBase[_], fun: NodeBase[_] => Unit) = {
+    val g = graph.get(node)
+
+    val succ = g.inNeighbors
+
+    succ.foreach({x => fun(x)})
+
+  }
+
+
+  protected[reakt] def _path(source: NodeBase[_], dest: NodeBase[_], fun: (NodeBase[_],NodeBase[_]) => Unit) =  {
+    val s = graph.get(source)
+    val d = graph.get(dest)
+
+    val succ = s.shortestPathTo(d)
+
+    if(!succ.isEmpty){
+      val path = succ.get
+      path.edgeIterator.foreach({
+        edge => fun(edge._1,edge._2)
+      })
+    }
+
+  }
+
+
+
+  override def toString(): String = {"Graph:\n----\n"+graph}
+
+
+
+
 }
 
 trait NodeBase[+T] {
 
 	protected var dependants = List[NodeBase[_]]()
 	protected var dependson = new HashMap[NodeBase[_], Boolean]()
+
+  protected def removeElemFromList[T](obj: T, list: List[T]) = list diff List(obj)
 
 
 	protected def onUpdateValue[B >: T](value: B): Unit;
@@ -64,12 +115,28 @@ trait NodeBase[+T] {
 		}
 	}
 
+  def rmDependant(d: NodeBase[_]): Unit = {
+    depLock.synchronized {
+  			dependants = this.removeElemFromList(d,dependants)
+  		}
+  }
+
+  def rmDependingOn(source: NodeBase[_]): Unit = {
+    depLock.synchronized {
+        dependson.remove(source)
+    }
+  }
+
 	private var cntr = 0;
 
 	def :<[A, B](sig1: NodeBase[A], sig2: NodeBase[B]): Unit = {
 		Reactive.connect(this, sig1)
 		Reactive.connect(this, sig2)
 	}
+
+  def disconnectAll: Unit = {
+    Reactive.disconnectNode(this)
+  }
 
 	def emit[T](m: T): Unit = {
 		this.emit(m, Reactive.cycle)

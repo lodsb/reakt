@@ -22,11 +22,10 @@
 
 package org.lodsb.reakt
 
-import async.BinOpSignalA
 import graph.{NodeBase, Edge, ReactiveGraph}
 import java.util.concurrent.atomic.{AtomicLong, AtomicBoolean}
 import actors.scheduler.ResizableThreadPoolScheduler
-import actors.Actor
+
 
 object Reactive extends ReactiveGraph {
 	lazy val scheduler = {
@@ -35,21 +34,74 @@ object Reactive extends ReactiveGraph {
 		s
 	}
 
-	def connect(source: NodeBase[_], destination: NodeBase[_]) {
-		edges ::= Edge(source, destination)
+  private val graphLock = new Object();
 
-		println(source + " " + destination)
-
-		source.addDependant(destination)
-		destination.addDependingOn(source)
+	def connect(source: NodeBase[_], destination: NodeBase[_]) = {
+    graphLock.synchronized {
+        _connect(source,destination)
+        source.addDependant(destination)
+        destination.addDependingOn(source)
+    }
 	}
 
-	def disconnect(source: NodeBase[_], destination: NodeBase[_]) = {}
+  protected[reakt] def fakeConnect(source: NodeBase[_], destination: NodeBase[_]) = {
+    graphLock.synchronized {
+      _connect(source,destination)
+    }
+  }
 
-	/*
-		impl me + locking
-	 */
-	def disconnectNode(NodeBase: NodeBase[_]) = {}
+	def disconnectSingle[T<:NodeBase[_]](source: T, destination: T) =  {
+    println("disconnect "+source+" "+destination)
+    graphLock.synchronized {
+
+      _disconnect(source,destination)
+      source.rmDependant(destination)
+      destination.rmDependingOn(source)
+    }
+  }
+
+  //
+  // disconnects a path of nodes
+  //
+  def disconnect[T<:NodeBase[_]](source: T, destination: T) = {
+     println("disconnect P"+source+" "+destination)
+    graphLock.synchronized{
+      _path(source,destination,{
+        (x,y) => this._disconnect(x, y)
+        x.rmDependant(y)
+        y.rmDependingOn(x)
+      })
+    }
+   }
+
+
+	def disconnectNode[T<:NodeBase[_]](node: T) = {
+      graphLock.synchronized{
+        _predecessors(node,{
+          x => this._disconnect(x, node)
+          x.rmDependant(node)
+          node.rmDependingOn(x)
+        })
+      }
+
+/*    println("ddd")
+    println(edges)
+    // slow & ugly
+    graphLock.synchronized {
+      edges.foreach({
+        f => f match {
+          case Edge(src, dest) => if(dest == node) {
+                                  println("disconnect")
+                                  println(f)
+                                    _disconnect(src,dest)
+                                  }
+        }
+      })
+
+    }
+    println("SSS")
+    println(edges)*/
+  }
 
 	private val currentCycle = new AtomicLong
 	currentCycle.set(0)
@@ -63,16 +115,18 @@ object Reactive extends ReactiveGraph {
 trait TObservableValue[+DefinedType, +UndefinedType] {
 	def value: Either[DefinedType, UndefinedType];
 
-	def observe(observerFun: DefinedType => Boolean): Unit
+	def observe(observerFun: DefinedType => Boolean): TReactive[_,_]
 	def map[B](f: DefinedType => B): TSignal[B];
+
 }
+
 
 /*
 	TODO: classes for conversion
  */
 
 trait TReactive[DefinedType, UndefinedType]
-	extends /*NodeBase[DefinedType] with */ TObservableValue[DefinedType, UndefinedType] {
+	extends TObservableValue[DefinedType, UndefinedType] {
 
 	protected var defaultDefValue: DefinedType;
 	protected var defaultUndefValue: UndefinedType;
@@ -112,7 +166,7 @@ trait TReactive[DefinedType, UndefinedType]
 		}
 	}
 
-	def observe(observerFun: DefinedType => Boolean): Unit;
+	def observe(observerFun: DefinedType => Boolean): TReactive[_,_];
 
 	def emit[T](m: T): Unit
 	def emit[T](m: T, c: Long = 0): Unit
@@ -128,9 +182,6 @@ trait TSignal[ValueType] extends TReactive[ValueType, ValueType] with TSignalet[
 	this._defValue 	= init;
 	this._undefValue 	= init;
 
-	// publish initial value
-	//this.emit(init)
-
 	override protected def generateUndefTypeValue(): ValueType = {
 		this._defValue
 	}
@@ -142,14 +193,15 @@ trait TSignal[ValueType] extends TReactive[ValueType, ValueType] with TSignalet[
 	def merge[A](that: TSignal[A]) = :>(that)
 
 	def :>[A](that: TSignal[A]): TSignal[Tuple2[ValueType, A]] = {
-		createBinOpSignal[ValueType, A, Tuple2[ValueType, A]](this, that, (x: ValueType, y: A) => (x, y));
+    val b = createBinOpSignal[ValueType, A, Tuple2[ValueType, A]](this, that, (x: ValueType, y: A) => (x, y));
+    b
 	}
 
 
 
 	def ~>[B >: ValueType](that: TVar[B]): TVar[B] = {
 
-		this.observe({x => that() = x ;true})
+		this.observe({x:ValueType => that() = x ;true})
 
 		that
 	}
@@ -163,8 +215,10 @@ trait TSignal[ValueType] extends TReactive[ValueType, ValueType] with TSignalet[
 	def -(that: TSignalet[ValueType])(implicit numeric2: Numeric[ValueType]) =
 		createBinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric2.minus(x, y))
 
-	def *(that: TSignalet[ValueType])(implicit numeric3: Numeric[ValueType]) =
-		createBinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric3.times(x, y))
+	def *(that: TSignalet[ValueType])(implicit numeric32: Numeric[ValueType]) =  {
+    import numeric32._
+		createBinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric32.times(x, y))
+  }
 
 	def min(that: TSignalet[ValueType])(implicit numeric4: Numeric[ValueType]) =
 		createBinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric4.min(x, y))

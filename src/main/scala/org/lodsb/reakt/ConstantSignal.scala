@@ -23,16 +23,12 @@
 package org.lodsb.reakt
 
 import async.BinOpSignalA
-
-
-//  TODO  move somewhere else!
-object ConstantSignal {
-	implicit def something2ConstantSignal[SC](something: SC) = new ConstantSignal(something)
-}
+import sync.ValS
 
 // TODO: FIXME: Covariance!
 class ConstantSignal[T](initial: T) extends TSignal[T] {
 	val init = initial;
+  val valS = new ValS(initial);
 	var defaultUndefValue = init;
 	var defaultDefValue   = init;
 
@@ -42,7 +38,7 @@ class ConstantSignal[T](initial: T) extends TSignal[T] {
 	def emitLocal[T](m: T): Unit = {}
 
 
-	def observe(observerFun: T => Boolean): Unit = {}
+  def observe(observerFun: T => Boolean): TReactive[_,_] = {valS}
 
 	def map[B](f: T => B): TSignal[B] = {
 		new ConstantSignal(f(this.value.merge))

@@ -23,6 +23,10 @@
 
 package org.lodsb.reakt
 
+import async.VarA
+import graph.NodeBase
+import sync.VarS
+
 trait TVar[T] extends TVal[T] {
 
 	//override def action(msg: T) = this.emit(msg)
@@ -32,8 +36,23 @@ trait TVar[T] extends TVal[T] {
 		this.emit(newValue)
 	}
 
+
 	def <~[B <% T](that: TSignal[B]) : TSignal[B] = {
-		that.observe({x => this() = x ;true})
+    println("dododododo "+ this+" x "+that)
+    println(Reactive)
+
+		val a = that.observe({x => this() = x ;true})
+
+    // ARGH - fail - have to think about getting rid of this cast
+    if (this.isInstanceOf[VarA[_]] || this.isInstanceOf[VarS[_]]) {
+      val obs:NodeBase[_] = a.asInstanceOf[NodeBase[_]]
+      val thi:NodeBase[_] = this.asInstanceOf[NodeBase[_]]
+
+      Reactive.fakeConnect(obs,thi);
+    }
+
+    println("----")
+    println(Reactive)
 
 		that
 	}

@@ -18,6 +18,8 @@ scalacOptions <++= scalaVersion map { version =>
  	else Nil
 }
 
+libraryDependencies += "com.assembla.scala-incubator" % "graph-core_2.9.2" % "1.5.1"
+
 unmanagedClasspath in Compile += Attributed.blank(new java.io.File("doesnotexist"))
 
 

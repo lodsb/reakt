@@ -22,16 +22,21 @@
 
 package org.lodsb.reakt.async
 
-import org.lodsb.reakt.graph.NodeAsynchronous
+
 import actors.Actor
 import org.lodsb.reakt._
+import graph.{NodeAsynchronous, NodeBase}
 
-protected[reakt] class BinOpSignalA[A, B, C](sig1: TSignalet[A], sig2: TSignalet[B], 											  bOpFun: (A, B) => C) extends BinOpSignal[A,B,C](sig1, sig2, bOpFun)  with NodeObservableAsynchronous[C, C]
+protected[reakt] class BinOpSignalA[A, B, C](sig1: TSignalet[A],
+                                             sig2: TSignalet[B],
+                                             bOpFun: (A, B) => C)
+  extends BinOpSignal[A,B,C](sig1, sig2, bOpFun)
+  with NodeObservableAsynchronous[C, C]
 
 trait NodeObservableAsynchronous[DefinedType, UndefinedType] extends NodeAsynchronous[DefinedType] {
 	protected[async] val reactive: TReactive[DefinedType, UndefinedType];
 
-	def observe(observerFun: DefinedType => Boolean): Unit = {
+	def observe(observerFun: DefinedType => Boolean) = {
 		val (defV, undefV) = reactive.defAndUndeValues
 		val observerReactive = new ObserverReactiveA[DefinedType, UndefinedType](defV, undefV, observerFun);
 
@@ -39,18 +44,17 @@ trait NodeObservableAsynchronous[DefinedType, UndefinedType] extends NodeAsynchr
 
 		observerReactive.start
 
+    observerReactive
+
 	}
 
 
-/*	override def start : Actor = {
+  def disconnect[T<:TReactive[_,_] ](source: T) : Unit = {
+    // AARG - fail ;(
+    Reactive.disconnect(source.asInstanceOf[org.lodsb.reakt.graph.NodeBase[_]],this)
+  }
 
-		val actor = super.start
-
-		this.bang
-
-		actor
-	}*/
-
+  def \~[T<:TReactive[_,_]](source: T) = NodeObservableAsynchronous.this.disconnect(source)
 
 	protected def createBinOpSignal[A, B, C](sig1: TSignalet[A], sig2: TSignalet[B], binOpFun: (A, B) => C): TSignal[C] = {
 		new BinOpSignalA(sig1, sig2, binOpFun)
