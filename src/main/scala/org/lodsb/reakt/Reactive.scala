@@ -83,24 +83,6 @@ object Reactive extends ReactiveGraph {
           node.rmDependingOn(x)
         })
       }
-
-/*    println("ddd")
-    println(edges)
-    // slow & ugly
-    graphLock.synchronized {
-      edges.foreach({
-        f => f match {
-          case Edge(src, dest) => if(dest == node) {
-                                  println("disconnect")
-                                  println(f)
-                                    _disconnect(src,dest)
-                                  }
-        }
-      })
-
-    }
-    println("SSS")
-    println(edges)*/
   }
 
 	private val currentCycle = new AtomicLong
