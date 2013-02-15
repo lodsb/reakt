@@ -25,7 +25,7 @@ package org.lodsb.reakt.graph
 import actors.Actor
 import java.util.Random
 import scala.collection.mutable.HashMap
-import org.lodsb.reakt.{Reactive}
+import org.lodsb.reakt.{TReactive, Reactive}
 import java.util.concurrent.atomic.{AtomicInteger, AtomicLong}
 import org.lodsb.reakt.sync.{NodeObservableSynchronous, ObserverReactiveS}
 import org.lodsb.reakt.async.{NodeObservableAsynchronous, VarA}
@@ -80,12 +80,7 @@ abstract class ReactiveGraph {
 
   }
 
-
-
   override def toString(): String = {"Graph:\n----\n"+graph}
-
-
-
 
 }
 

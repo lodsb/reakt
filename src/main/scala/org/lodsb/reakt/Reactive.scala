@@ -38,6 +38,7 @@ object Reactive extends ReactiveGraph {
 
 	def connect(source: NodeBase[_], destination: NodeBase[_]) = {
     graphLock.synchronized {
+      println("connect src "+source+" dst "+destination)
         _connect(source,destination)
         source.addDependant(destination)
         destination.addDependingOn(source)
@@ -45,6 +46,7 @@ object Reactive extends ReactiveGraph {
 	}
 
   protected[reakt] def fakeConnect(source: NodeBase[_], destination: NodeBase[_]) = {
+    println("fconn "+source+ " dst "+destination)
     graphLock.synchronized {
       _connect(source,destination)
     }
@@ -79,6 +81,10 @@ object Reactive extends ReactiveGraph {
           x => this._disconnect(x, node)
           x.rmDependant(node)
           node.rmDependingOn(x)
+
+          node.rmDependant(x)
+          x.rmDependingOn(node)
+
         })
       }
   }
@@ -146,6 +152,12 @@ trait TReactive[DefinedType, UndefinedType]
 		}
 	}
 
+  // TODO: should maybe move disconnect* somewhere else, since connecting is done entirely on the Signal level
+  // extra trait?
+  def disconnect[T<:TReactive[_,_]](source: T) : Unit
+
+  def |~[T<:TReactive[_,_]](source: T) = this.disconnect(source)
+
 	def observe(observerFun: DefinedType => Boolean): TReactive[_,_];
 
 	def emit[T](m: T): Unit
@@ -177,8 +189,6 @@ trait TSignal[ValueType] extends TReactive[ValueType, ValueType] with TSignalet[
     b
 	}
 
-
-
 	def ~>[B >: ValueType](that: TVar[B]): TVar[B] = {
 
 		this.observe({x:ValueType => that() = x ;true})
@@ -207,8 +217,8 @@ trait TSignal[ValueType] extends TReactive[ValueType, ValueType] with TSignalet[
 		createBinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric5.max(x, y))
 
 	//TODO:FIXME: where is it called from?
-	//def ==(that: TSignalet[ValueType])(implicit numeric6: Numeric[ValueType]) =
-	//	createBinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric6.equiv(x, y))
+	def eq(that: TSignalet[ValueType])(implicit numeric6: Numeric[ValueType]) =
+		createBinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric6.equiv(x, y))
 
 	def >=(that: TSignalet[ValueType])(implicit numeric7: Numeric[ValueType]) =
 		createBinOpSignal(this, that, (x: ValueType, y: ValueType) => numeric7.gteq(x, y))

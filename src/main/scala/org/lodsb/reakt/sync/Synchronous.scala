@@ -22,10 +22,14 @@
 
 package org.lodsb.reakt.sync
 
-import org.lodsb.reakt.graph.NodeSynchronous
 import org.lodsb.reakt._
+import graph.{NodeSynchronous, NodeBase}
 
-class BinOpSignalS[A, B, C](sig1: TSignalet[A], sig2: TSignalet[B], 											  binOpFun: (A, B) => C) extends BinOpSignal[A,B,C](sig1, sig2, binOpFun)  with NodeObservableSynchronous[C, C]
+class BinOpSignalS[A, B, C](sig1: TSignalet[A],
+                            sig2: TSignalet[B],
+                            binOpFun: (A, B) => C)
+  extends BinOpSignal[A,B,C](sig1, sig2, binOpFun)
+  with NodeObservableSynchronous[C, C]
 
 trait NodeObservableSynchronous[DefinedType, UndefinedType] extends NodeSynchronous[DefinedType] {
 	protected[sync] val reactive: TReactive[DefinedType, UndefinedType];
@@ -38,6 +42,10 @@ trait NodeObservableSynchronous[DefinedType, UndefinedType] extends NodeSynchron
 
     observerReactive
 	}
+
+  def disconnect[T<:TReactive[_,_]](source: T) : Unit = {
+    Reactive.disconnect(source.asInstanceOf[NodeBase[_]],this)
+  }
 
 	protected def createBinOpSignal[A, B, C](sig1: TSignalet[A], sig2: TSignalet[B], binOpFun: (A, B) => C): TSignal[C] = {
 		new BinOpSignalS(sig1, sig2, binOpFun)
@@ -113,9 +121,21 @@ class ReactiveS[X, Y](override var defaultDefValue: X, override var defaultUndef
 	val reactive = this;
 }
 
+// TODO: should create base class for observerreactive*
 protected[sync] class ObserverReactiveS[X, Y](x: X, y: Y, private val fun: X => Boolean)
 	extends ReactiveS[X, Y](x, y)
 	with NodeObservableSynchronous[X, Y] {
+
+    // this is always an intermediate signal, so if the
+  // dependant is removed, this reactive can get unlinked
+  //
+  override def rmDependant(d: NodeBase[_]): Unit = {
+    super.rmDependant(d)
+    dependson.foreach( {
+      f => val (n, b) = f;
+        n.rmDependant(this);
+    })
+  }
 
 	override protected def action(msg: X): Unit = {
 		if (!fun(msg)) {

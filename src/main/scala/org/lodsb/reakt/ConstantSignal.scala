@@ -23,6 +23,7 @@
 package org.lodsb.reakt
 
 import async.BinOpSignalA
+import graph.NodeBase
 import sync.ValS
 
 // TODO: FIXME: Covariance!
@@ -37,6 +38,7 @@ class ConstantSignal[T](initial: T) extends TSignal[T] {
 	def emit[T](m: T, c: Long = 0): Unit = {}
 	def emitLocal[T](m: T): Unit = {}
 
+  def disconnect[T<:TReactive[_,_]](source: T) : Unit = {}
 
   def observe(observerFun: T => Boolean): TReactive[_,_] = {valS}
 

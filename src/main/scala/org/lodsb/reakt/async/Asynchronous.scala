@@ -48,13 +48,11 @@ trait NodeObservableAsynchronous[DefinedType, UndefinedType] extends NodeAsynchr
 
 	}
 
-
-  def disconnect[T<:TReactive[_,_] ](source: T) : Unit = {
-    // AARG - fail ;(
-    Reactive.disconnect(source.asInstanceOf[org.lodsb.reakt.graph.NodeBase[_]],this)
+  def disconnect[T<:TReactive[_,_]](source: T) : Unit = {
+    Reactive.disconnect(source.asInstanceOf[NodeBase[_]],this)
   }
 
-  def \~[T<:TReactive[_,_]](source: T) = NodeObservableAsynchronous.this.disconnect(source)
+
 
 	protected def createBinOpSignal[A, B, C](sig1: TSignalet[A], sig2: TSignalet[B], binOpFun: (A, B) => C): TSignal[C] = {
 		new BinOpSignalA(sig1, sig2, binOpFun)
@@ -76,7 +74,6 @@ trait NodeObservableAsynchronous[DefinedType, UndefinedType] extends NodeAsynchr
 
 
 }
-
 
 class SignalA[T](initialValue: T) extends TSignal[T] with NodeObservableAsynchronous[T, T] {
 	val init = initialValue;
@@ -135,6 +132,16 @@ protected[async] class ObserverReactiveA[X, Y](x: X, y: Y, private val fun: X =>
 	extends ReactiveA[X, Y](x, y)
 	with NodeObservableAsynchronous[X, Y] {
 
+  // this is always an intermediate signal, so if the
+  // dependant is removed, this reactive can get unlinked
+  //
+  override def rmDependant(d: NodeBase[_]): Unit = {
+    super.rmDependant(d)
+    dependson.foreach( {
+      f => val (n, b) = f;
+        n.rmDependant(this);
+    })
+  }
 	override protected def action(msg: X): Unit = {
 		if (!fun(msg)) {
 			Reactive.disconnectNode(this);
