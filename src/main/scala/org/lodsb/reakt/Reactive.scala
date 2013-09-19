@@ -22,17 +22,20 @@
 
 package org.lodsb.reakt
 
-import graph.{NodeBase, Edge, ReactiveGraph}
+import graph.{MessageActor, NodeBase, Edge, ReactiveGraph}
 import java.util.concurrent.atomic.{AtomicLong, AtomicBoolean}
-import actors.scheduler.ResizableThreadPoolScheduler
+import akka.actor.{Props, ActorSystem}
+import akka.routing.RandomRouter
 
 
 object Reactive extends ReactiveGraph {
-	lazy val scheduler = {
-		val s = new ResizableThreadPoolScheduler(false)
-		s.start()
-		s
-	}
+  private val nrOfWorkers = 32;
+
+	lazy val system = ActorSystem("reakt")
+  lazy val router = system.actorOf(Props[MessageActor]
+                    .withRouter(RandomRouter(nrOfWorkers)), name = "MessageRouter")
+
+
 
   private val graphLock = new Object();
 

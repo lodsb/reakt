@@ -34,11 +34,11 @@ object Tests {
 		val z = new VarA[String](" WORLD")
 
 		x.observe({ff => println(ff); true})
-		x.start;
+		//x.start;
 
 		val y = new VarS[Int](0)
 		val u = new VarA[Int](2000)
-		u.start
+		//u.start
 		y
 
 		y <~ x + u + 10000000;
@@ -56,6 +56,8 @@ object Tests {
 
 		u() = 9600
 		x() = 10
+
+    println("THE END "+z())
 
 
 

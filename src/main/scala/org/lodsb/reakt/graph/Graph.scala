@@ -22,7 +22,7 @@
 
 package org.lodsb.reakt.graph
 
-import actors.Actor
+import akka.actor._
 import java.util.Random
 import scala.collection.mutable.HashMap
 import org.lodsb.reakt.{TReactive, Reactive}
@@ -32,7 +32,7 @@ import org.lodsb.reakt.async.{NodeObservableAsynchronous, VarA}
 
 case class Edge(source: NodeBase[_], destination: NodeBase[_])
 
-case class Propagate[T](cycle: Long, source: NodeBase[_], message: T)
+case class Propagate[T](cycle: Long, source: NodeBase[_], destination: NodeBase[_],  message: T)
 
 
 abstract class ReactiveGraph {
@@ -166,13 +166,17 @@ trait NodeBase[+T] {
 
 	protected def sendMessage[T](node: NodeBase[T], m: T, c: Long = 0): Unit = {
 		if (node.isInstanceOf[NodeAsynchronous[_]]) {
-			node.asInstanceOf[NodeAsynchronous[_]] ! Propagate(c, this, m)
+			val asyncNode = node.asInstanceOf[NodeAsynchronous[_]]
+
+      Reactive.router ! Propagate(c, this, asyncNode, m)
+
+
 		} else if (node.isInstanceOf[NodeSynchronous[_]]) {
 			node.distributeMessage(c, this, m)
 		}
 	}
 
-	protected def distributeMessage[Z](c: Long, s: NodeBase[_], msg: Z): Unit = {
+	/*protected*/ def distributeMessage[Z](c: Long, s: NodeBase[_], msg: Z): Unit = {
 		depLock.synchronized {
 			if (dependson.size == 0) {
 				onUpdateValue(msg.asInstanceOf[T])
@@ -195,10 +199,25 @@ trait NodeBase[+T] {
 
 }
 
+//generischer actor -> verwendet graphen, fuer nachrichten, sonst unabh von nodeasync
+// !!! in sendMessage
+// sende das senden der message and menge von akka actors? propagate muss dann aber empfänger enthalten
+// router?
+
+class MessageActor extends Actor  {
+  def receive = {
+    case p@Propagate(c, s, destination, msg) => {
+    					destination.distributeMessage(c, s, msg)
+    }
+    case _ => System.err.println("Message type not understood!")
+  }
+}
+
 trait NodeSynchronous[T] extends NodeBase[T]
 
-trait NodeAsynchronous[T] extends Actor with NodeBase[T] {
+trait NodeAsynchronous[T] extends NodeBase[T] {
 
+  /*
 	def act() = {
 		loop {
 			react {
@@ -208,10 +227,20 @@ trait NodeAsynchronous[T] extends Actor with NodeBase[T] {
 				case _ => System.err.println("Message type not understood!")
 			}
 		}
+
 	}
+
+  def receive = {
+    case p@Propagate(c, s, d, msg) => {
+    					this.distributeMessage(c, s, msg)
+    }
+    case _ => System.err.println("Message type not understood!")
+  }*/
+
 
 }
 
+/*
 object Test {
 	val noMsg = 100000;
 	var it = 5
@@ -427,6 +456,6 @@ object Test {
 
 	}
 }
-
+*/
 
 

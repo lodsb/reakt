@@ -23,7 +23,7 @@
 package org.lodsb.reakt.async
 
 
-import actors.Actor
+import akka.actor._
 import org.lodsb.reakt._
 import graph.{NodeAsynchronous, NodeBase}
 
@@ -41,8 +41,6 @@ trait NodeObservableAsynchronous[DefinedType, UndefinedType] extends NodeAsynchr
 		val observerReactive = new ObserverReactiveA[DefinedType, UndefinedType](defV, undefV, observerFun);
 
 		Reactive.connect(this, observerReactive)
-
-		observerReactive.start
 
     observerReactive
 

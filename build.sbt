@@ -2,9 +2,9 @@ name := "reakt"
 
 organization := "org.lodsb"
 
-version := "0.1-SNAPSHOT"
+version := "0.2-SNAPSHOT"
 
-scalaVersion := "2.9.2"
+scalaVersion := "2.10.1"
 
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-Dfile.encoding=ISO-8859-1") //, "-Xprint:typer")
@@ -18,7 +18,11 @@ scalacOptions <++= scalaVersion map { version =>
  	else Nil
 }
 
-libraryDependencies += "com.assembla.scala-incubator" % "graph-core_2.9.2" % "1.5.1"
+resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
+
+libraryDependencies += "com.assembla.scala-incubator" % "graph-core_2.10" % "1.6.2"
+
+libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.2.0"
 
 unmanagedClasspath in Compile += Attributed.blank(new java.io.File("doesnotexist"))
 

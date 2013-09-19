@@ -25,7 +25,6 @@ package org.lodsb.reakt.property {
 import org.lodsb.reakt.async.ValA
 
 class Property[T](deferor: VarDeferor, name: String, init: T, val set: (T) => Unit, val get: () => T) extends VarDefering[T](deferor, init) {
-
 	override def updateCallback(newVal: T) = {
 		set(newVal)
 		super.updateCallback(get())
