@@ -24,4 +24,5 @@ package org.lodsb.reakt.property
 
 abstract trait VarDeferor {
 	def defer[T](`def` : Deferable[T]): Unit
+
 }
