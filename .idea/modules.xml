@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea_modules/reakt.iml" filepath="$PROJECT_DIR$/.idea_modules/reakt.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea_modules/reakt-build.iml" filepath="$PROJECT_DIR$/.idea_modules/reakt-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/reakt.iml" filepath="$PROJECT_DIR$/.idea/modules/reakt.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/reakt-build.iml" filepath="$PROJECT_DIR$/.idea/modules/reakt-build.iml" />
     </modules>
   </component>
 </project>

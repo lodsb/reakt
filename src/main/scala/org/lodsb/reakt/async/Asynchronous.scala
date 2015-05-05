@@ -25,7 +25,7 @@ package org.lodsb.reakt.async
 
 import akka.actor._
 import org.lodsb.reakt._
-import graph.{NodeAsynchronous, NodeBase}
+import graph.{NodeAsynchronous, NodeBase, Observable}
 
 protected[reakt] class BinOpSignalA[A, B, C](sig1: TSignalet[A],
                                              sig2: TSignalet[B],
@@ -33,9 +33,12 @@ protected[reakt] class BinOpSignalA[A, B, C](sig1: TSignalet[A],
   extends BinOpSignal[A,B,C](sig1, sig2, bOpFun)
   with NodeObservableAsynchronous[C, C]
 
-trait NodeObservableAsynchronous[DefinedType, UndefinedType] extends NodeAsynchronous[DefinedType] {
+// TODO: move observable stuff upwards
+// nodeasynchronous and synchronous should have both type params or none
+trait NodeObservableAsynchronous[DefinedType, UndefinedType] extends NodeAsynchronous[DefinedType] with Observable[DefinedType, UndefinedType] {
 	protected[async] val reactive: TReactive[DefinedType, UndefinedType];
 
+  @Override
 	def observe(observerFun: DefinedType => Boolean) = {
 		val (defV, undefV) = reactive.defAndUndeValues
 		val observerReactive = new ObserverReactiveA[DefinedType, UndefinedType](defV, undefV, observerFun);
@@ -52,11 +55,15 @@ trait NodeObservableAsynchronous[DefinedType, UndefinedType] extends NodeAsynchr
 
 
 
+  // instead of signalets, maybe a nodeobservable is enough?
+  @Override
 	protected def createBinOpSignal[A, B, C](sig1: TSignalet[A], sig2: TSignalet[B], binOpFun: (A, B) => C): TSignal[C] = {
 		new BinOpSignalA(sig1, sig2, binOpFun)
 	}
 
 
+  //TODO: should be moved to baseclass
+  @Override
 	def map[B](f: DefinedType => B): TSignal[B] = {
 
 		val value = f(reactive.value.merge.asInstanceOf[DefinedType]);
@@ -90,6 +97,7 @@ class IOA[T](initI: T, initO: T) extends TIO[T] {
 	val in = new VarA[T](initI)
 }
 
+// should use self types
 class ValA[T](initialValue: T) extends TVal[T] with NodeObservableAsynchronous[T, T] {
 	val init = initialValue;
 	var defaultDefValue = init;

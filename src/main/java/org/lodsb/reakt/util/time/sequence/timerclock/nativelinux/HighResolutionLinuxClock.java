@@ -186,6 +186,8 @@ public class HighResolutionLinuxClock implements ClockInterface, Runnable {
 	}
 
 	static long ticks = 0;
+
+    /*
 	public static void main(String[] args) {
 		HighResolutionLinuxClock c;
 
@@ -217,5 +219,5 @@ public class HighResolutionLinuxClock implements ClockInterface, Runnable {
 		c.stopClock();
 
 		System.out.println(new Double(end-start)/((double) ticks));
-	}
+	}*/
 }

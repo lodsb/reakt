@@ -25,7 +25,7 @@ package org.lodsb.reakt.graph
 import akka.actor._
 import java.util.Random
 import scala.collection.mutable.HashMap
-import org.lodsb.reakt.{TReactive, Reactive}
+import org.lodsb.reakt.{TSignalet, TSignal, TReactive, Reactive}
 import java.util.concurrent.atomic.{AtomicInteger, AtomicLong}
 import org.lodsb.reakt.sync.{NodeObservableSynchronous, ObserverReactiveS}
 import org.lodsb.reakt.async.{NodeObservableAsynchronous, VarA}
@@ -130,6 +130,7 @@ trait NodeBase[+T] {
 	}
 
   def disconnectAll: Unit = {
+    //TODO: fixme!!
     Reactive.disconnectNode(this)
   }
 
@@ -164,19 +165,10 @@ trait NodeBase[+T] {
 	}
 
 
-	protected def sendMessage[T](node: NodeBase[T], m: T, c: Long = 0): Unit = {
-		if (node.isInstanceOf[NodeAsynchronous[_]]) {
-			val asyncNode = node.asInstanceOf[NodeAsynchronous[_]]
-
-      Reactive.router ! Propagate(c, this, asyncNode, m)
-
-
-		} else if (node.isInstanceOf[NodeSynchronous[_]]) {
-			node.distributeMessage(c, this, m)
-		}
-	}
+	protected def sendMessage[T](node: NodeBase[T], m: T, c: Long = 0): Unit
 
 	/*protected*/ def distributeMessage[Z](c: Long, s: NodeBase[_], msg: Z): Unit = {
+    //todo: fixme, allow recursion
 		depLock.synchronized {
 			if (dependson.size == 0) {
 				onUpdateValue(msg.asInstanceOf[T])
@@ -199,6 +191,29 @@ trait NodeBase[+T] {
 
 }
 
+trait NodeSynchronous[T] extends NodeBase[T] {
+  @Override
+  def sendMessage[T](node: NodeBase[T], m: T, c: Long = 0): Unit  = {
+         node.distributeMessage(c, this, m)
+  }
+}
+
+trait NodeAsynchronous[T] extends NodeBase[T] {
+  @Override
+  def sendMessage[T](node: NodeBase[T], m: T, c: Long = 0): Unit  = {
+      //val asyncNode = node.asInstanceOf[NodeAsynchronous[_]]
+
+      Reactive.router ! Propagate(c, this, node, m)
+  }
+}
+
+trait Observable[T,U] {
+  def observe(observerFun: T => Boolean): TReactive[T,U]
+  def map[B](f: T => B): TSignal[B]
+
+  protected def createBinOpSignal[A, B, C](sig1: TSignalet[A], sig2: TSignalet[B], binOpFun: (A, B) => C): TSignal[C]
+}
+
 //generischer actor -> verwendet graphen, fuer nachrichten, sonst unabh von nodeasync
 // !!! in sendMessage
 // sende das senden der message and menge von akka actors? propagate muss dann aber empfänger enthalten
@@ -212,10 +227,6 @@ class MessageActor extends Actor  {
     case _ => System.err.println("Message type not understood!")
   }
 }
-
-trait NodeSynchronous[T] extends NodeBase[T]
-
-trait NodeAsynchronous[T] extends NodeBase[T] {
 
   /*
 	def act() = {
@@ -238,7 +249,6 @@ trait NodeAsynchronous[T] extends NodeBase[T] {
   }*/
 
 
-}
 
 /*
 object Test {

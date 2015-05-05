@@ -31,17 +31,22 @@ import akka.routing.RandomRouter
 object Reactive extends ReactiveGraph {
   private val nrOfWorkers = 32;
 
+  //TODO: maybe do eager eval here to reduce time for first messages?
 	lazy val system = ActorSystem("reakt")
   lazy val router = system.actorOf(Props[MessageActor]
                     .withRouter(RandomRouter(nrOfWorkers)), name = "MessageRouter")
 
+  def startup = {
+    println(system.name + " started, router " + router.toString())
+  }
 
+  def shutdown = system.shutdown()
 
   private val graphLock = new Object();
 
 	def connect(source: NodeBase[_], destination: NodeBase[_]) = {
     graphLock.synchronized {
-      println("connect src "+source+" dst "+destination)
+      //println("connect src "+source+" dst "+destination)
         _connect(source,destination)
         source.addDependant(destination)
         destination.addDependingOn(source)
@@ -49,7 +54,7 @@ object Reactive extends ReactiveGraph {
 	}
 
   protected[reakt] def fakeConnect(source: NodeBase[_], destination: NodeBase[_]) = {
-    println("fconn "+source+ " dst "+destination)
+    //println("fconn "+source+ " dst "+destination)
     graphLock.synchronized {
       _connect(source,destination)
     }
@@ -112,6 +117,8 @@ trait TObservableValue[+DefinedType, +UndefinedType] {
 
 /*
 	TODO: classes for conversion
+	TODO: use self-types
+	TODO: reactive-field not used?
  */
 
 trait TReactive[DefinedType, UndefinedType]

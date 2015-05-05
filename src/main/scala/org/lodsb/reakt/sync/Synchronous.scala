@@ -23,7 +23,7 @@
 package org.lodsb.reakt.sync
 
 import org.lodsb.reakt._
-import graph.{NodeSynchronous, NodeBase}
+import graph.{NodeSynchronous, NodeBase, Observable}
 
 class BinOpSignalS[A, B, C](sig1: TSignalet[A],
                             sig2: TSignalet[B],
@@ -31,7 +31,8 @@ class BinOpSignalS[A, B, C](sig1: TSignalet[A],
   extends BinOpSignal[A,B,C](sig1, sig2, binOpFun)
   with NodeObservableSynchronous[C, C]
 
-trait NodeObservableSynchronous[DefinedType, UndefinedType] extends NodeSynchronous[DefinedType] {
+
+trait NodeObservableSynchronous[DefinedType, UndefinedType] extends NodeSynchronous[DefinedType] with Observable[DefinedType, UndefinedType] {
 	protected[sync] val reactive: TReactive[DefinedType, UndefinedType];
 
 	def observe(observerFun: DefinedType => Boolean) = {
@@ -47,11 +48,13 @@ trait NodeObservableSynchronous[DefinedType, UndefinedType] extends NodeSynchron
     Reactive.disconnect(source.asInstanceOf[NodeBase[_]],this)
   }
 
-	protected def createBinOpSignal[A, B, C](sig1: TSignalet[A], sig2: TSignalet[B], binOpFun: (A, B) => C): TSignal[C] = {
+  @Override
+	def createBinOpSignal[A, B, C](sig1: TSignalet[A], sig2: TSignalet[B], binOpFun: (A, B) => C): TSignal[C] = {
 		new BinOpSignalS(sig1, sig2, binOpFun)
 	}
 
 
+  @Override
 	def map[B](f: DefinedType => B): TSignal[B] = {
 
 		val value = f(reactive.value.merge.asInstanceOf[DefinedType]);
