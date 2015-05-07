@@ -97,7 +97,6 @@ class IOA[T](initI: T, initO: T) extends TIO[T] {
 	val in = new VarA[T](initI)
 }
 
-// should use self types
 class ValA[T](initialValue: T) extends TVal[T] with NodeObservableAsynchronous[T, T] {
 	val init = initialValue;
 	var defaultDefValue = init;
