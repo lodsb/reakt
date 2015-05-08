@@ -50,7 +50,7 @@ processing, VarS for synchronous processing (function calls). You can connect th
 We now map the value stream of 'aValue' to a string Stream in the next line using 'aValue.map(x => "My value is "+x)' and then connect it to some reactive
 property of a (hypothetical) text label. 
 
-The next lines are more interesting because we are using some of the operators provided by react here. 
+The next lines are more interesting because we are using some of the operators provided by Reakt here. 
 The multipliedValue gets a new stream which contains the result of slider.value times aValue. If either of these changes multipliedValue is updated.
 someBooleanStream takes this further and shows that you can also compare streams and combine them for logical operations to create a boolean stream.
 In the last line it is shown how you can simply update a stream (or node) by "assigning" it a new value. Afterwards, everything that depends on
