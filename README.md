@@ -84,4 +84,5 @@ implement multi-level processing
 - recheck covariance
 - higher order active routing (switch/scanner etc)
 - named variables in combination with global proxying, to update several sources at once
-- pull processing (i have to think that - there are various ways to implement it properly) 
+- pull processing (i have to think that - there are various ways to implement it properly)
+- persistence in nodes, versioning? 
