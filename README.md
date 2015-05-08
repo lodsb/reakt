@@ -66,9 +66,10 @@ These are the results for various pipeline lengths (3 to 500 nodes). Note that s
 
 ![nodes performance](node_experiments.png "performance evaluation using a silly pipeline example")
 
-It is apparent that the asynchronous message passing has at least a ten-fold execution overhead compared to direct function calls and, similarly an overhead of the factor 2 - 8.
-This can be traced back to the mechanisms in the actor implementation (\eg thread scheduling, resulting delays in message receipt).
+For this silly example (we would have to test more graph topologies), it is apparent that the asynchronous message passing has at least a ten-fold execution overhead compared to direct function calls and, similarly an overhead of the factor 2 - 8.
+This can be traced back to the mechanisms in the actor implementation (eg. thread scheduling, resulting delays in message receipt).
 Conversely, the overhead of the synchronous graph execution compared to direct calls (roughly a factor 5 in the experiments) can be accounted to the delegation method.
+
 
 
 *Note: this is more of a rant but I am slightly bored of the fact that nearly all publications or buzzword bingo slides about reactive programming
