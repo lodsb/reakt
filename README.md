@@ -1,4 +1,4 @@
-#React: functional reactive programming 
+#Reakt: asynchronous and synchronous functional reactive programming made simple
 -----
 
 Reakt is influenced by languages such as PureData and Max*.
