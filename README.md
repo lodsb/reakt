@@ -52,18 +52,20 @@ In the last line it is shown how you can simply update a stream (or node) by "as
 aValue will get updated accordingly. Pretty simple, huh?
 
 Of course, in the background there are some additional nodes created and some implicit type conversions performed.
-From the example above, the graph that is created internally looks like this: 
+From the example above, the graph that is created looks like this, internally: 
 ![nodes example](nodes_example.png "graph structure created by the example")
 
 There are additional operators and functions for mapping, connecting/disconnecting, math ops, merges, using tuples etc.
 For now, you can look at https://github.com/lodsb/reakt/blob/master/src/main/scala/org/lodsb/reakt/Reactive.scala#L209 , https://github.com/lodsb/reakt/blob/master/src/main/scala/org/lodsb/reakt/graph/Graph.scala#L210 , 
-https://github.com/lodsb/reakt/blob/master/src/main/scala/org/lodsb/reakt/Reactive.scala#L167 - sorry for the inconveniences!
+https://github.com/lodsb/reakt/blob/master/src/main/scala/org/lodsb/reakt/Reactive.scala#L167 - sorry for the inconvenience!
 
 ##Performance
-Of course there is an overhead added when using Reakt.
+Of course, there is an overhead added when using Reakt.
 As a simple test, I created a straight pipeline of processing steps using a) direct function calls b) synchronous reakt c) asynchronous reakt.
 These are the results for various pipeline lengths (3 to 500 nodes). Note that such long pipelines are - in my opinion - not that common in practical implementations.
-![nodes performance](nodes_experiments.png "performance evaluation using a silly pipeline example")
+
+![nodes performance](node_experiments.png "performance evaluation using a silly pipeline example")
+
 It is apparent that the asynchronous message passing has at least a ten-fold execution overhead compared to direct function calls and, similarly an overhead of the factor 2 - 8.
 This can be traced back to the mechanisms in the actor implementation (\eg thread scheduling, resulting delays in message receipt).
 Conversely, the overhead of the synchronous graph execution compared to direct calls (roughly a factor 5 in the experiments) can be accounted to the delegation method.
