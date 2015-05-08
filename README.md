@@ -82,6 +82,6 @@ such as Max for already 25 years.
 implement multi-level processing 
 - packing/unpacking and applying tuples as function argument streams
 - recheck covariance
-- higher order actvie routing (switch/scanner etc)
+- higher order active routing (switch/scanner etc)
 - named variables in combination with global proxying, to update several sources at once
 - pull processing (i have to think that - there are various ways to implement it properly) 
