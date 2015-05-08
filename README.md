@@ -29,6 +29,8 @@ An example, that supposes there is some UI lib that has reactive properties for 
 val sliderValue <~ slider.value
 sliderValue.observe { x =>
 	println("My value is "+x)
+	
+	true
 }
 
 val aValue = new VarA(3.0f)
@@ -40,6 +42,9 @@ aValue() = 4
 ```
 The '<~' operator connects or creates signals (streams). The first line creates a new node in the graph (sliderValue) which will receive new values if the slider is changed.
 You can observe our new node by simply passing a observer function. This one does nothing fancy, it just sits there and receives values - and prints them.
+The return value tells Reakt that the observer function wants to receive values the next time as well - it is simply a convenient way to disconnect the observer
+based on some internal state - false will disconnect.
+
 The next line (val aValue = new VarA(3.0f)) creates a new node explicitly with an initial value (3.0f) which will post messages asynchronously. VarA is for asynchronous
 processing, VarS for synchronous processing (function calls). You can connect these either way using the '<~' operator, it will take care of everything.
 We now map the value stream of 'aValue' to a string Stream in the next line using 'aValue.map(x => "My value is "+x)' and then connect it to some reactive
