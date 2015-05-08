@@ -76,12 +76,12 @@ Conversely, the overhead of the synchronous graph execution compared to direct c
 simply neglect the fact that reactive/dataflow programming has been around since the late 60s. It has been applied in languages
 such as Max for already 25 years. 
 
-TODO (features and notes to myself, unordered):
+##TODO (features and notes to myself, unordered):
 - higher kind function application streams (f, data) => apply
 - allowing recursion (currently cyclic message passing is detected and the message is dropped) - I implemented this as a measure to reduce errors, but I think reactive recursion (?) can be valuable to 
 implement multi-level processing 
 - packing/unpacking and applying tuples as function argument streams
 - recheck covariance
 - higher order actvie routing (switch/scanner etc)
-- named variables
+- named variables in combination with global proxying, to update several sources at once
 - pull processing (i have to think that - there are various ways to implement it properly) 
