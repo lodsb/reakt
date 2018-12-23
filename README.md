@@ -1,4 +1,4 @@
-#Reakt: asynchronous and synchronous functional reactive programming made simple
+# Reakt: asynchronous and synchronous functional reactive programming made simple
 -----
 
 Reakt is influenced by languages such as PureData and Max*.
@@ -7,7 +7,7 @@ It follows a simple methodology:
 * nodes in the graph represent exactly one function that can output something depening on some input 
 * connections between nodes can be either synchronous or asynchronous
 
-##Features: 
+## Features: 
 * mixing asynchronous and synchronous processing seamlessly without any boilerplate stuff 
 * uses memoization to reduce unnecessary re-computations/evaluations
 * allows any data type to be handled reactively
@@ -19,11 +19,11 @@ It follows a simple methodology:
 * a dead simple DSL ... really!
 * has been used for ~4 years now without any hicups, mostly stayed the same, not really much to add :-)
 
-###About async/sync
+### About async/sync
 * Synchronous processing uses direct method calls.
 * Asynchronous processing uses Akka with a worker pool.
 
-##Example
+## Example
 An example, that supposes there is some UI lib that has reactive properties for sliders and text labels (see my UltraCom project): 
 ```scala
 val sliderValue <~ slider.value
@@ -64,7 +64,7 @@ There are additional operators and functions for mapping, connecting/disconnecti
 For now, you can look at https://github.com/lodsb/reakt/blob/master/src/main/scala/org/lodsb/reakt/Reactive.scala#L209 , https://github.com/lodsb/reakt/blob/master/src/main/scala/org/lodsb/reakt/graph/Graph.scala#L210 , 
 https://github.com/lodsb/reakt/blob/master/src/main/scala/org/lodsb/reakt/Reactive.scala#L167 - sorry for the inconvenience!
 
-##Performance
+## Performance
 Of course, there is an overhead added when using Reakt.
 As a simple test, I created a straight pipeline of processing steps using a) direct function calls b) synchronous reakt c) asynchronous reakt.
 These are the results for various pipeline lengths (3 to 500 nodes). Note that such long pipelines are - in my opinion - not that common in practical implementations.
@@ -81,7 +81,7 @@ Conversely, the overhead of the synchronous graph execution compared to direct c
 simply neglect the fact that reactive/dataflow programming has been around since the late 60s. It has been applied in languages
 such as Max for already 25 years. 
 
-##TODO (features and notes to myself, unordered):
+## TODO (features and notes to myself, unordered):
 - higher kind function application streams (f, data) => apply
 - allowing recursion (currently cyclic message passing is detected and the message is dropped) - I implemented this as a measure to reduce errors, but I think reactive recursion (?) can be valuable to 
 implement multi-level processing 
